@@ -3,5 +3,8 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/twitter4j-core-4.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/persist-2011-04-30.jar"/>
+	<classpathentry kind="lib" path="lib/commons-dbutils-1.5.jar"/>
+	<classpathentry kind="lib" path="lib/h2-1.4.181.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

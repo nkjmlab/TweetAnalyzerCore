@@ -36,8 +36,8 @@ public class DBConnector {
 	private Connection getConnection() {
 		Connection con2 = null;
 		try {
-			con2 = DriverManager.getConnection(
-					"jdbc:h2:tcp://localhost/~/tweets", "sa", "");
+			con2 = DriverManager.getConnection(conf.getJdbcURL(),
+					conf.getUsername(), conf.getPassword());
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

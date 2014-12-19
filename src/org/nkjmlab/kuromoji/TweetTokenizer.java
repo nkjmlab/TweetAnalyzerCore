@@ -4,17 +4,16 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 import net.sf.persist.Persist;
 
 import org.atilika.kuromoji.Token;
 import org.atilika.kuromoji.Tokenizer;
-import org.nkjmlab.tweet.Config;
 import org.nkjmlab.tweet.DBConnector;
 
 public class TweetTokenizer {
-
-	private Persist persist = new DBConnector(new Config()).getPersist();
 
 	public static void main(String[] args) {
 		new TweetTokenizer().run(new File("data/tmp2.txt"), "NOUNS", "名詞");
@@ -30,14 +29,19 @@ public class TweetTokenizer {
 						String sql = "INSERT INTO " + tableName + " VALUES (?)";
 						String word = token.getSurfaceForm();
 
-						int num = persist.read(Integer.class,
-								"SELECT COUNT(*) FROM " + tableName
-										+ " WHERE WORD=?", word);
+						try (Connection con = DBConnector.getConnection()) {
+							Persist persist = new Persist(con);
+							int num = persist.read(Integer.class,
+									"SELECT COUNT(*) FROM " + tableName
+											+ " WHERE WORD=?", word);
 
-						if (num == 0) {
-							persist.executeUpdate(sql, word);
+							if (num == 0) {
+								persist.executeUpdate(sql, word);
+							}
+							System.out.println(word);
+						} catch (SQLException e) {
+							e.printStackTrace();
 						}
-						System.out.println(word);
 					}
 				}
 			}

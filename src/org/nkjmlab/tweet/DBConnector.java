@@ -1,49 +1,27 @@
 package org.nkjmlab.tweet;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import net.sf.persist.Persist;
+import org.h2.jdbcx.JdbcConnectionPool;
 
 public class DBConnector {
 
-	private Connection con;
-	private Persist persist;
-	private Config conf;
+	private static JdbcConnectionPool cp = null;
 
-	public static void main(String[] args) {
-		new DBConnector(new Config()).getConnection();
+	public static Config conf = new Config();
+
+	public static Connection getConnection() throws SQLException {
+		return getConnection(conf);
 	}
 
-	public DBConnector(Config conf) {
-		this.conf = conf;
-	}
+	public static Connection getConnection(Config conf) throws SQLException {
 
-	public void close() {
-		try {
-			this.con.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public Persist getPersist() {
-		this.persist = new Persist(getConnection());
-		return persist;
-	}
-
-	private Connection getConnection() {
-		Connection con2 = null;
-		try {
-			con2 = DriverManager.getConnection(conf.getJdbcURL(),
+		if (cp == null) {
+			cp = JdbcConnectionPool.create(conf.getJdbcURL(),
 					conf.getUsername(), conf.getPassword());
-		} catch (SQLException e) {
-			e.printStackTrace();
 		}
-
-		this.con = con2;
-		return con2;
+		return cp.getConnection();
 	}
 
 }

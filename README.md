@@ -8,5 +8,7 @@ TweetAnalyzer
 ## Eclipse上でのツイート取得プログラムの起動
 - Eclipseを起動し「ファイル→インポート→既存プロジェクトをワークスペースへ」を選び，このディレクトリを指定する．
 - Config.javaに前項で指定したJDBC URLを設定する．また，Config.javaにaccessToken, accessTokenSecret, consumerKey, consumerSecretを設定する．
-- TweetsCrawler.javaを起動すると「巨人」という単語が含まれるツイートを探索するようになっている．適宜，自分の好きなキーワードに変更する．
+- TweetsCrawlerLauncher.javaを起動すると「慶応」という単語が含まれるツイートを探索するようになっている．適宜，自分の好きなキーワードに変更する．
 - H2コンソールで「SELECT * FROM TWEEETS;」とすると集計したツイートを閲覧することができる．![](http://i.gyazo.com/77eb34d367f2c7965edcb6262eb630fe.png)
+
+## Tweeterのアクセストークンを取得する．

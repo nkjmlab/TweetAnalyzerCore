@@ -1,11 +1,16 @@
 package org.nkjmlab.tweet;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import net.sf.persist.Persist;
+
+import org.apache.log4j.Logger;
+
+import twitter4j.GeoLocation;
 import twitter4j.HashtagEntity;
 import twitter4j.Query;
 import twitter4j.QueryResult;
@@ -15,90 +20,90 @@ import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.auth.AccessToken;
 
-public class TweetsCrawler implements Runnable {
+public class TweetsCrawler {
 
-	private Twitter twitter = new TwitterFactory().getInstance();
+	private static Logger log = Logger.getLogger(TweetsCrawler.class);
 
 	private ScheduledExecutorService searchExecutor;
 
-	private String searchWord;
+	private long maxId;
 
-	private Persist persist = new DBConnector(new Config()).getPersist();
-
-	public static void main(String[] args) {
-		new TweetsCrawler("巨人").run();
+	public TweetsCrawler() {
 	}
 
-	public TweetsCrawler(String searchWord) {
-		this.searchWord = searchWord;
-	}
-
-	@Override
-	public void run() {
-		prepareTwitter();
-
+	public void writeTweetsToTable(String tableName, Query query) {
+		this.maxId = query.getMaxId();
 		searchExecutor = Executors.newSingleThreadScheduledExecutor();
-		searchExecutor.scheduleWithFixedDelay(new TweetsSearchTask(searchWord),
-				0, 5, TimeUnit.SECONDS);
-
-	}
-
-	private void prepareTwitter() {
-		Config conf = new Config();
-		AccessToken accessToken = new AccessToken(conf.getAccessToken(),
-				conf.getAccessTokenSecret());
-		twitter.setOAuthConsumer(conf.getConsumerKey(),
-				conf.getConsumerSecret());
-		twitter.setOAuthAccessToken(accessToken);
+		searchExecutor.scheduleWithFixedDelay(new TweetsSearchTask(tableName,
+				query), 0, 5, TimeUnit.SECONDS);
 
 	}
 
 	class TweetsSearchTask implements Runnable {
+		private final String tableName;
+		private final Query query;
 
-		private Query query;
-		private long maxId = Long.MAX_VALUE;
+		private Persist persist = new DBConnector(new Config()).getPersist();
 
-		public TweetsSearchTask(String searchWord) {
-			this.query = new Query(searchWord);
+		public TweetsSearchTask(String tableName, Query query) {
+			this.tableName = tableName;
+			this.query = query;
+			this.query.setMaxId(maxId);
+		}
+
+		private Twitter prepareTwitter() {
+			Twitter twitter = new TwitterFactory().getInstance();
+			Config conf = new Config();
+			AccessToken accessToken = new AccessToken(conf.getAccessToken(),
+					conf.getAccessTokenSecret());
+			twitter.setOAuthConsumer(conf.getConsumerKey(),
+					conf.getConsumerSecret());
+			twitter.setOAuthAccessToken(accessToken);
+			return twitter;
 		}
 
 		@Override
 		public void run() {
-			query.setCount(100);
-
 			try {
-				QueryResult result = twitter.search(query);
+
+				QueryResult result = prepareTwitter().search(query);
 				List<Status> tweets = result.getTweets();
+				if (tweets.size() == 0) {
+					log.error("No Result. maxId=" + maxId);
+				}
+
 				for (Status tweet : tweets) {
-
-					System.out.println(tweet.getId());
 					insert(tweet);
-					maxId = tweet.getId();
+					maxId = tweet.getId() < maxId ? tweet.getId() : maxId;
 				}
-
-				query.setMaxId(maxId);
-
-				if (query == null) {
-					System.err.println("Query is null. Max Id is " + maxId);
-					searchExecutor.shutdownNow();
-				}
-
-			} catch (TwitterException te) {
-				te.printStackTrace();
-				System.err.println("Failed to search tweets: "
-						+ te.getMessage());
-				System.err.println("Max Id is " + maxId);
+			} catch (TwitterException e) {
+				e.printStackTrace();
+				log.error("Failed to search tweets: " + e.getMessage());
+				log.error("Max Id is " + maxId);
+				searchExecutor.shutdownNow();
 			}
 		}
 
 		public void insert(Status tweet) {
 			try {
-				String sql = "INSERT INTO TWEETS VALUES (?,?,?,?,?,?,?,?)";
+				String sql = "INSERT INTO " + tableName
+						+ " VALUES (?,?,?,?,?,?,?,?,?)";
 
 				long id = tweet.getId();
 				String createdAt = tweet.getCreatedAt().toString();
-				String geoLocation = tweet.getGeoLocation() == null ? null
-						: tweet.getGeoLocation().toString();
+				SimpleDateFormat sdf = new SimpleDateFormat(
+						"yyyy-MM-dd HH:mm:ss");
+				createdAt = sdf.format(tweet.getCreatedAt());
+
+				GeoLocation geoLocation = tweet.getGeoLocation();
+				double lat = 0.0;
+				double lng = 0.0;
+
+				if (geoLocation != null) {
+					lat = geoLocation.getLatitude();
+					lng = geoLocation.getLongitude();
+				}
+
 				String hashEntities = "#";
 
 				for (HashtagEntity hashtag : tweet.getHashtagEntities()) {
@@ -114,16 +119,15 @@ public class TweetsCrawler implements Runnable {
 				String retweetId = tweet.getRetweetedStatus() == null ? null
 						: String.valueOf(tweet.getRetweetedStatus().getId());
 
-				String match = persist.read(String.class,
-						"(select id FROM TWEETS WHERE id=?)", id);
+				String match = persist.read(String.class, "(select id FROM "
+						+ tableName + " WHERE id=?)", id);
 				if (match == null) {
-					persist.executeUpdate(sql, id, createdAt, geoLocation,
-							hashEntities, place, user, retweetId, text);
-					System.out.println("Insert a new tweet.");
+					log.debug(String.valueOf(id));
+					persist.executeUpdate(sql, id, createdAt, lat, lng, place,
+							user, retweetId, text, hashEntities);
+					log.debug("Insert a new tweet.");
 				} else {
-					System.out
-							.println("This tweet has been already inserted. id="
-									+ id);
+					log.debug("This tweet has been already inserted. id=" + id);
 				}
 
 			} catch (Throwable e) {

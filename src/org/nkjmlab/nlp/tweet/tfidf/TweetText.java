@@ -1,4 +1,4 @@
-package org.nkjmlab.tfidf;
+package org.nkjmlab.nlp.tweet.tfidf;
 
 import net.sf.persist.annotations.NoTable;
 

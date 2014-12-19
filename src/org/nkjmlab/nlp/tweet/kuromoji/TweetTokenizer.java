@@ -1,4 +1,4 @@
-package org.nkjmlab.kuromoji;
+package org.nkjmlab.nlp.tweet.kuromoji;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,7 +11,7 @@ import net.sf.persist.Persist;
 
 import org.atilika.kuromoji.Token;
 import org.atilika.kuromoji.Tokenizer;
-import org.nkjmlab.tweet.DBConnector;
+import org.nkjmlab.util.RDBConnector;
 
 public class TweetTokenizer {
 
@@ -29,7 +29,7 @@ public class TweetTokenizer {
 						String sql = "INSERT INTO " + tableName + " VALUES (?)";
 						String word = token.getSurfaceForm();
 
-						try (Connection con = DBConnector.getConnection()) {
+						try (Connection con = RDBConnector.getConnection()) {
 							Persist persist = new Persist(con);
 							int num = persist.read(Integer.class,
 									"SELECT COUNT(*) FROM " + tableName

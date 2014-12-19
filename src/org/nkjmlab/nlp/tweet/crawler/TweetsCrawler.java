@@ -1,4 +1,4 @@
-package org.nkjmlab.tweet;
+package org.nkjmlab.nlp.tweet.crawler;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 import net.sf.persist.Persist;
 
 import org.apache.log4j.Logger;
+import org.nkjmlab.util.RDBConnector;
 
 import twitter4j.GeoLocation;
 import twitter4j.HashtagEntity;
@@ -52,7 +53,7 @@ public class TweetsCrawler {
 
 		private Twitter prepareTwitter() {
 			Twitter twitter = new TwitterFactory().getInstance();
-			Config conf = new Config();
+			TwitterConfig conf = new TwitterConfig();
 			AccessToken accessToken = new AccessToken(conf.getAccessToken(),
 					conf.getAccessTokenSecret());
 			twitter.setOAuthConsumer(conf.getConsumerKey(),
@@ -116,7 +117,7 @@ public class TweetsCrawler {
 			String retweetId = tweet.getRetweetedStatus() == null ? null
 					: String.valueOf(tweet.getRetweetedStatus().getId());
 
-			try (Connection con = DBConnector.getConnection()) {
+			try (Connection con = RDBConnector.getConnection()) {
 				Persist persist = new Persist(con);
 				String match = persist.read(String.class, "(select id FROM "
 						+ tableName + " WHERE id=?)", id);

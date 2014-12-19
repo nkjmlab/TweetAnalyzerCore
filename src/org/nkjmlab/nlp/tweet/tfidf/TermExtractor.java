@@ -1,4 +1,4 @@
-package org.nkjmlab.tfidf;
+package org.nkjmlab.nlp.tweet.tfidf;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -12,8 +12,8 @@ import net.sf.persist.Persist;
 import org.apache.log4j.Logger;
 import org.atilika.kuromoji.Token;
 import org.atilika.kuromoji.Tokenizer;
-import org.nkjmlab.tweet.Config;
-import org.nkjmlab.tweet.DBConnector;
+import org.nkjmlab.util.RDBConfig;
+import org.nkjmlab.util.RDBConnector;
 
 public class TermExtractor {
 	private static Logger log = Logger.getLogger(TermExtractor.class);
@@ -47,7 +47,7 @@ public class TermExtractor {
 	private void extract(Date from, Date to, String tableName) {
 		String outputTable = tableName + "_NOUNS";
 
-		try (Connection con = DBConnector.getConnection(new Config())) {
+		try (Connection con = RDBConnector.getConnection(new RDBConfig())) {
 			Persist persist = new Persist(con);
 			List<TweetText> tweets = persist.readList(TweetText.class,
 					"SELECT ID, TEXT, CREATEDAT FROM " + tableName

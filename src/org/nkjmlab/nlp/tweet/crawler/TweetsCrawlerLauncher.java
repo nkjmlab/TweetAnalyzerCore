@@ -1,6 +1,4 @@
-package org.nkjmlab.tweet.sample;
-
-import org.nkjmlab.tweet.TweetsCrawler;
+package org.nkjmlab.nlp.tweet.crawler;
 
 import twitter4j.GeoLocation;
 import twitter4j.Query;

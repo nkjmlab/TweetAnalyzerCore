@@ -2,8 +2,6 @@ package org.nkjmlab.nlp.tweet.tfidf;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -12,68 +10,70 @@ import net.sf.persist.Persist;
 import org.apache.log4j.Logger;
 import org.atilika.kuromoji.Token;
 import org.atilika.kuromoji.Tokenizer;
+import org.nkjmlab.util.DBUtil;
+import org.nkjmlab.util.DateUtil;
 import org.nkjmlab.util.RDBConfig;
 import org.nkjmlab.util.RDBConnector;
 
-public class TermExtractor {
-	private static Logger log = Logger.getLogger(TermExtractor.class);
+public class KeywordExtractor {
+	private static Logger log = Logger.getLogger(KeywordExtractor.class);
 
 	public static void main(String[] args) {
-		TermExtractor extractor = new TermExtractor();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-		try {
-			extractor.extract(sdf.parse("2014-11-30 00:00:00"),
-					sdf.parse("2014-11-30 23:59:59"), "CHOSHI");
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
+		updateKeywords("CHOSHI", "2014-11-30");
 
 	}
 
-	private void run() {
-		SimpleDateFormat sdfBefore = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	public static void updateKeywords(String targetTable, String date) {
+		String keywordTable = targetTable + "_NOUNS";
 
-		try {
-			log.debug(sdfBefore.parse(""));
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
+		DBUtil.drop(keywordTable);
+		DBUtil.create(keywordTable, "WORD VARCHAR PRIMARY KEY");
+		List<TweetText> tweets = extractTweets(targetTable,
+				DateUtil.parse(date + " 00:00:00"),
+				DateUtil.parse(date + " 23:59:59"));
+		extractAndInsert(keywordTable, tweets);
 	}
 
-	public TermExtractor() {
-	}
-
-	private void extract(Date from, Date to, String tableName) {
-		String outputTable = tableName + "_NOUNS";
-
+	private static List<TweetText> extractTweets(String targetTable, Date from,
+			Date to) {
 		try (Connection con = RDBConnector.getConnection(new RDBConfig())) {
 			Persist persist = new Persist(con);
 			List<TweetText> tweets = persist.readList(TweetText.class,
-					"SELECT ID, TEXT, CREATEDAT FROM " + tableName
+					"SELECT ID, TEXT, CREATEDAT FROM " + targetTable
 							+ " WHERE CREATEDAT BETWEEN ? AND ?",
 					from.toString(), to.toString());
+			return tweets;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	private static void extractAndInsert(String keywordTable,
+			List<TweetText> tweets) {
+
+		try (Connection con = RDBConnector.getConnection(new RDBConfig())) {
+			Persist persist = new Persist(con);
 
 			Tokenizer torknizer = Tokenizer.builder().build();
 			for (TweetText tweet : tweets) {
 				for (Token token : torknizer.tokenize(tweet.getText())) {
 					if (token.getAllFeatures().contains("名詞")) {
-						String sql = "INSERT INTO " + outputTable
+						String sql = "INSERT INTO " + keywordTable
 								+ " VALUES (?)";
 						String word = token.getSurfaceForm();
 
 						if (persist.read(Integer.class, "SELECT COUNT(*) FROM "
-								+ outputTable + " WHERE WORD=?", word) == 0) {
+								+ keywordTable + " WHERE WORD=?", word) == 0) {
 							persist.executeUpdate(sql, word);
 						}
-						System.out.println(word);
 					}
 				}
 			}
-
 		} catch (SQLException e) {
-			// TODO 自動生成された catch ブロック
 			e.printStackTrace();
 		}
 	}
+
 }

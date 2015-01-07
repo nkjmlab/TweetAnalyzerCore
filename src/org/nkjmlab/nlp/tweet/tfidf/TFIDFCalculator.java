@@ -8,7 +8,7 @@ import java.util.Map;
 
 import net.sf.persist.Persist;
 
-import org.nkjmlab.util.DBUtil;
+import org.nkjmlab.util.RDBUtil;
 import org.nkjmlab.util.RDBConfig;
 import org.nkjmlab.util.RDBConnector;
 
@@ -55,8 +55,8 @@ public class TFIDFCalculator {
 			Map<String, IDF> idfs, List<String> termsWhichHasValidIDF) {
 		String resultTable = tableName + "_RESULT";
 
-		DBUtil.drop(resultTable);
-		DBUtil.create(resultTable,
+		RDBUtil.drop(resultTable);
+		RDBUtil.create(resultTable,
 				" WORD VARCHAR PRIMARY KEY, TFIDF DOUBLE, TF DOUBLE, IDF DOUBLE");
 
 		try (Connection con = RDBConnector.getConnection(new RDBConfig())) {

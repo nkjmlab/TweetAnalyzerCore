@@ -7,16 +7,14 @@ import java.util.List;
 
 import net.sf.persist.Persist;
 
-import org.apache.log4j.Logger;
 import org.atilika.kuromoji.Token;
 import org.atilika.kuromoji.Tokenizer;
-import org.nkjmlab.util.DBUtil;
 import org.nkjmlab.util.DateUtil;
 import org.nkjmlab.util.RDBConfig;
 import org.nkjmlab.util.RDBConnector;
+import org.nkjmlab.util.RDBUtil;
 
 public class KeywordExtractor {
-	private static Logger log = Logger.getLogger(KeywordExtractor.class);
 
 	public static void main(String[] args) {
 
@@ -27,8 +25,8 @@ public class KeywordExtractor {
 	public static void updateKeywords(String targetTable, String date) {
 		String keywordTable = targetTable + "_NOUNS";
 
-		DBUtil.drop(keywordTable);
-		DBUtil.create(keywordTable, "WORD VARCHAR PRIMARY KEY");
+		RDBUtil.drop(keywordTable);
+		RDBUtil.create(keywordTable, "WORD VARCHAR PRIMARY KEY");
 		List<TweetText> tweets = extractTweets(targetTable,
 				DateUtil.parse(date + " 00:00:00"),
 				DateUtil.parse(date + " 23:59:59"));

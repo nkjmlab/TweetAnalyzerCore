@@ -66,14 +66,14 @@ public class TweetsBackwardCrawler {
 		@Override
 		public void run() {
 			try {
-
+				log.debug(query);
 				QueryResult result = prepareTwitter().search(query);
 				List<Status> tweets = result.getTweets();
 				if (tweets.size() == 0) {
 					log.error("No Result. maxId=" + maxId);
 				}
 
-				action.procTweets(tweets);
+				action.procTweets(query, tweets);
 
 				for (Status tweet : tweets) {
 					maxId = tweet.getId() < maxId ? tweet.getId() : maxId;

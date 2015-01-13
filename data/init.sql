@@ -1,6 +1,8 @@
 DROP TABLE TWEETS IF EXISTS;
 
 CREATE TABLE TWEETS(
+    category VARCHAR DEFAULT 'NONE',
+    queryId long DEFAULT -1,
     id long PRIMARY KEY, 
     createdAt TIMESTAMP,
     lat DOUBLE,

@@ -1,35 +1,41 @@
 package org.nkjmlab.nlp.tweet.crawler;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import net.sf.persist.Persist;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.nkjmlab.nlp.tweet.model.SearchQuery;
 import org.nkjmlab.nlp.tweet.model.Tweet;
-import org.nkjmlab.util.RDBConnector;
+import org.nkjmlab.nlp.tweet.model.TweetDB;
 
 import twitter4j.GeoLocation;
 import twitter4j.HashtagEntity;
+import twitter4j.Query;
 import twitter4j.Status;
 
-public class InsertToTable implements Action {
+public class RecordQueryAndResponse implements Action {
 	private static Logger log = LogManager.getLogger();
+	private String tableName = "TWEETS";
+	private String category;
 
-	private final String tableName;
+	public RecordQueryAndResponse(String category) {
+		this.category = category;
+	}
 
-	public InsertToTable(String tableName) {
+	public RecordQueryAndResponse(String tableName, String category) {
+		this(category);
 		this.tableName = tableName;
 	}
 
 	@Override
-	public void procTweets(List<Status> rawTweets) throws SQLException {
+	public void procTweets(Query query, List<Status> rawTweets)
+			throws SQLException {
 		List<Tweet> tweets = convertStatusToTweets(rawTweets);
-		insert(tweets);
+		// insertSearchQuery(query);
+		TweetDB.insertTweets(tweets);
 	}
 
 	public List<Tweet> convertStatusToTweets(List<Status> tweets) {
@@ -70,23 +76,6 @@ public class InsertToTable implements Action {
 
 		return result;
 
-	}
-
-	public void insert(List<Tweet> tweets) throws SQLException {
-		for (Tweet tweet : tweets) {
-			try (Connection con = RDBConnector.getConnection()) {
-				Persist persist = new Persist(con);
-				String match = persist.read(String.class, "(select id FROM "
-						+ tableName + " WHERE id=?)", tweet.getId());
-				if (match == null) {
-					persist.insert(tweet);
-					log.debug("Insert a new tweet.");
-				} else {
-					log.debug("This tweet has been already inserted. id="
-							+ tweet.getId());
-				}
-			}
-		}
 	}
 
 }

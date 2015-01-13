@@ -2,12 +2,16 @@ package org.nkjmlab.nlp.tweet.model;
 
 import java.util.Date;
 
+import net.sf.persist.annotations.NoTable;
+
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
+@NoTable
 public class Tweet {
 
 	private long id;
+
 	private Date createdAt;
 	private double lat;
 	private double lng;

@@ -16,7 +16,6 @@ public class RDBConnector {
 	}
 
 	public static Connection getConnection(RDBConfig conf) throws SQLException {
-
 		if (cp == null) {
 			cp = JdbcConnectionPool.create(conf.getJdbcURL(),
 					conf.getUsername(), conf.getPassword());

@@ -1,97 +1,97 @@
 package org.nkjmlab.nlp.tweet.tfidf;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Date;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import net.sf.persist.Persist;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.atilika.kuromoji.Token;
 import org.atilika.kuromoji.Tokenizer;
+import org.nkjmlab.nlp.tweet.model.Tweet;
+import org.nkjmlab.nlp.tweet.model.TweetDB;
 import org.nkjmlab.util.DateUtil;
-import org.nkjmlab.util.RDBConfig;
-import org.nkjmlab.util.RDBConnector;
 
 public class TFCalculator {
+	private static Logger log = LogManager.getLogger();
 
 	public static void main(String[] args) {
-		List<String> terms = getKeyWords("CHOSHI_NOUNS");
-		String focusDay = "2014-11-24";
-		Map<String, TF> tfs = calcTFs("CHOSHI", focusDay, terms);
-		System.out.println(tfs);
+		String tableName = "CHOSHI_TWEETS";
+		String focusDay = "2014-11-30";
+
+		List<Tweet> tweets = TweetDB.readTweets(tableName,
+				DateUtil.parseFromTimeStamp(focusDay + " 00:00:00"),
+				DateUtil.parseFromTimeStamp(focusDay + " 23:59:59"));
+		log.info("Start extract keywords ...");
+
+		Set<String> keywords = new KeywordCalculator().extractKeywords(tweets);
+		log.info("Start calculate idfs ...");
+
+		Map<String, TF> tfs = new TFCalculator().calcValidTFs(tableName,
+				focusDay, keywords);
+		log.info("Start write result ...");
+		log.debug(tfs);
 	}
 
-	public static Map<String, TF> calcTFs(String tableName, String focusDay,
-			List<String> terms) {
+	public Map<String, TF> calcValidTFs(String tableName, String focusDay,
+			Set<String> terms) {
+		Map<String, TF> result = new HashMap<>();
 
+		for (TF tf : calcTFs(tableName, focusDay, terms).values()) {
+			if (tf.getTF() < 0.0001) {
+				continue;
+			}
+			result.put(tf.getTerm(), tf);
+		}
+		return result;
+
+	}
+
+	public Map<String, TF> calcTFs(String tableName, String focusDay,
+			Collection<String> terms) {
 		Map<String, TF> tfs = new HashMap<>();
-		for (String term : terms) {
 
-			TF tf = TFCalculator.calculateTf(tableName,
-					DateUtil.parse(focusDay + " 00:00:00"),
-					DateUtil.parse(focusDay + " 23:59:59"), term);
+		String from = focusDay + " 00:00:00";
+		String to = focusDay + " 23:59:59";
+		List<Tweet> allTweets = TweetDB.readTweets("SELECT * FROM " + tableName
+				+ " WHERE CREATEDAT BETWEEN ? AND ? ", from, to);
+		int allNouns = calcNumOfAllNouns(allTweets);
+		for (String term : terms) {
+			TF tf = calculateTf(tableName, from, to, term, allNouns);
 			tfs.put(term, tf);
 		}
 		// Collections.sort(tfs);
 
 		return tfs;
+	}
+
+	public TF calculateTf(String targetTableName, String from, String to,
+			String term, int allNouns) {
+		String query = "%" + term + "%";
+
+		List<Tweet> tweets = TweetDB.readTweets("SELECT * FROM "
+				+ targetTableName
+				+ " WHERE CREATEDAT BETWEEN ? AND ? AND TEXT LIKE ? ", from,
+				to, query);
+
+		return new TF(term, tweets.size(), allNouns);
 
 	}
 
-	public static List<String> getKeyWords(String targetTableName) {
-		try (Connection con = RDBConnector.getConnection(new RDBConfig())) {
-			Persist persist = new Persist(con);
+	private Tokenizer torknizer = Tokenizer.builder().build();
 
-			return persist.readList(String.class, "SELECT WORD FROM "
-					+ targetTableName);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	public static TF calculateTf(String targetTableName, Date from, Date to,
-			String term) {
-		try (Connection con = RDBConnector.getConnection(new RDBConfig())) {
-			Persist persist = new Persist(con);
-			String query = "%" + term + "%";
-
-			List<TweetText> tweets = persist
-					.readList(
-							TweetText.class,
-							"SELECT ID, TEXT, CREATEDAT FROM "
-									+ targetTableName
-									+ " WHERE CREATEDAT BETWEEN ? AND ? AND TEXT LIKE ? ",
-							from.toString(), to.toString(), query);
-
-			return new TF(term, tweets.size(), getNumOfAllNouns(tweets));
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return null;
-
-	}
-
-	private static int allNouns = Integer.MIN_VALUE;
-
-	private static int getNumOfAllNouns(List<TweetText> tweets) {
-		if (allNouns != Integer.MIN_VALUE) {
-			return allNouns;
-		}
+	private int calcNumOfAllNouns(List<Tweet> tweets) {
 		int counter = 0;
-		Tokenizer torknizer = Tokenizer.builder().build();
-		for (TweetText tweet : tweets) {
+		for (Tweet tweet : tweets) {
 			for (Token token : torknizer.tokenize(tweet.getText())) {
 				if (token.getAllFeatures().contains("名詞")) {
 					counter++;
 				}
 			}
 		}
-		allNouns = counter;
-		return allNouns;
+		return counter;
 	}
 
 }

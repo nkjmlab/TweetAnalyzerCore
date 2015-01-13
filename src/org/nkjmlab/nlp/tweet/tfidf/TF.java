@@ -14,6 +14,10 @@ public class TF implements Comparable<TF> {
 		this.term = term;
 		this.number = number;
 		this.total = total;
+		if (number > total) {
+			System.err.println(this);
+		}
+
 	}
 
 	public double getTF() {

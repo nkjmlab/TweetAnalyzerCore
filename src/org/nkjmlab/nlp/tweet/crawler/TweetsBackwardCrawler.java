@@ -23,8 +23,10 @@ public class TweetsBackwardCrawler {
 
 	private long maxId;
 	private ScheduledFuture<?> scheduledTasks;
+	private TwitterConfig conf;
 
-	public TweetsBackwardCrawler() {
+	public TweetsBackwardCrawler(TwitterConfig conf) {
+		this.conf = conf;
 	}
 
 	/**
@@ -54,7 +56,6 @@ public class TweetsBackwardCrawler {
 
 		private Twitter prepareTwitter() {
 			Twitter twitter = new TwitterFactory().getInstance();
-			TwitterConfig conf = new TwitterConfig();
 			AccessToken accessToken = new AccessToken(conf.getAccessToken(),
 					conf.getAccessTokenSecret());
 			twitter.setOAuthConsumer(conf.getConsumerKey(),

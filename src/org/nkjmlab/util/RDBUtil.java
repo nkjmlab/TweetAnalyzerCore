@@ -1,7 +1,6 @@
 package org.nkjmlab.util;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +19,7 @@ public class RDBUtil {
 			Persist persist = new Persist(con);
 
 			return persist.read(clazz, sql, objs);
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -32,7 +31,7 @@ public class RDBUtil {
 			Persist persist = new Persist(con);
 
 			return persist.readList(clazz, sql, objs);
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return new ArrayList<T>();
@@ -44,7 +43,7 @@ public class RDBUtil {
 			Persist persist = new Persist(con);
 
 			return persist.readMapList(sql, objs);
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return new ArrayList<Map<String, Object>>();
@@ -55,7 +54,7 @@ public class RDBUtil {
 			Persist persist = new Persist(con);
 
 			return persist.readMap(sql, objs);
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return new HashMap<String, Object>();
@@ -65,7 +64,7 @@ public class RDBUtil {
 		try (Connection con = RDBConnector.getConnection()) {
 			Persist persist = new Persist(con);
 			persist.executeUpdate(sql, objs);
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -75,7 +74,7 @@ public class RDBUtil {
 			Persist persist = new Persist(con);
 			persist.executeUpdate("DROP TABLE " + tableName + " IF EXISTS");
 
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -85,7 +84,7 @@ public class RDBUtil {
 			Persist persist = new Persist(con);
 			persist.executeUpdate("CREATE TABLE " + tableName + " (" + schema
 					+ ")");
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -94,7 +93,7 @@ public class RDBUtil {
 		try (Connection con = RDBConnector.getConnection()) {
 			Persist persist = new Persist(con);
 			persist.insert(obj);
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

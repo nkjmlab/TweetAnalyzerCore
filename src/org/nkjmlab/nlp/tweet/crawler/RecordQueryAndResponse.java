@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.nkjmlab.nlp.tweet.model.SearchQuery;
 import org.nkjmlab.nlp.tweet.model.Tweet;
 import org.nkjmlab.nlp.tweet.model.TweetDB;
 
@@ -18,16 +17,11 @@ import twitter4j.Status;
 
 public class RecordQueryAndResponse implements Action {
 	private static Logger log = LogManager.getLogger();
-	private String tableName = "TWEETS";
-	private String category;
+	private String table;
 
-	public RecordQueryAndResponse(String category) {
-		this.category = category;
-	}
-
-	public RecordQueryAndResponse(String tableName, String category) {
-		this(category);
-		this.tableName = tableName;
+	public RecordQueryAndResponse(String table) {
+		this.table = table;
+		TweetDB.createTweetTable(table);
 	}
 
 	@Override
@@ -35,7 +29,7 @@ public class RecordQueryAndResponse implements Action {
 			throws SQLException {
 		List<Tweet> tweets = convertStatusToTweets(rawTweets);
 		// insertSearchQuery(query);
-		TweetDB.insertTweets(tweets);
+		TweetDB.insertTweets(table, tweets);
 	}
 
 	public List<Tweet> convertStatusToTweets(List<Status> tweets) {

@@ -32,14 +32,14 @@ public class TweetDB {
 	}
 
 	public static void insertTweet(String table, Tweet t) {
+		if (RDBUtil.read(Tweet.class, "SELECT * FROM " + table + " WHERE ID=?",
+				t.getId()) != null) {
+			return;
+		}
 		String sql = "INSERT INTO " + table + " VALUES (?,?,?,?,?,?,?,?,?)";
 		RDBUtil.executeUpdate(sql, t.getId(), t.getCreatedAt(), t.getLat(),
 				t.getLat(), t.getPlace(), t.getUser(), t.getRetweetId(),
 				t.getText(), t.getHashtagEntities());
-	}
-
-	public static void insertSearchQuery(SearchQuery searchQuery) {
-		RDBUtil.insert(searchQuery);
 	}
 
 	public static void createTweetTable(String tableName) {
@@ -47,16 +47,20 @@ public class TweetDB {
 				+ "lat DOUBLE," + "lng DOUBLE," + "place VARCHAR,"
 				+ "user VARCHAR," + "retweetId long, " + "text VARCHAR,"
 				+ "hashtagEntities VARCHAR, ";
-		RDBUtil.executeUpdate("CREATE TABLE " + tableName + " (" + schema + ")");
+		RDBUtil.executeUpdate("CREATE TABLE IF NOT EXISTS " + tableName + " ("
+				+ schema + ")");
 
-		RDBUtil.executeUpdate("CREATE INDEX " + tableName + "_createdAt ON "
-				+ tableName + "(createdAt)");
+		RDBUtil.executeUpdate("CREATE INDEX IF NOT EXISTS " + tableName
+				+ "_createdAt ON " + tableName + "(createdAt)");
+
+		RDBUtil.executeUpdate("CREATE INDEX IF NOT EXISTS " + tableName
+				+ "_user ON " + tableName + "(user)");
 
 	}
 
-	public static void insertTweets(List<Tweet> tweets) {
+	public static void insertTweets(String table, List<Tweet> tweets) {
 		for (Tweet t : tweets) {
-			RDBUtil.insert(t);
+			insertTweet(table, t);
 			log.debug(t.getId());
 		}
 	}

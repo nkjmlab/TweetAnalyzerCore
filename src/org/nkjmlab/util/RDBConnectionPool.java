@@ -5,17 +5,17 @@ import java.sql.SQLException;
 
 import org.h2.jdbcx.JdbcConnectionPool;
 
-public class RDBConnector {
+public class RDBConnectionPool {
 
-	private static JdbcConnectionPool cp = null;
+	private JdbcConnectionPool cp = null;
 
-	public static RDBConfig conf;
+	public RDBConfig conf;
 
-	public static void setConf(RDBConfig conf) {
-		RDBConnector.conf = conf;
+	public RDBConnectionPool(RDBConfig conf) {
+		this.conf = conf;
 	}
 
-	public static Connection getConnection() throws SQLException {
+	public Connection getConnection() throws SQLException {
 		if (cp == null) {
 			cp = JdbcConnectionPool.create(conf.getJdbcURL(),
 					conf.getUsername(), conf.getPassword());

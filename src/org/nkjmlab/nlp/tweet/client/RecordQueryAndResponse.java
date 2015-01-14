@@ -1,6 +1,5 @@
-package org.nkjmlab.nlp.tweet.crawler;
+package org.nkjmlab.nlp.tweet.client;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -18,18 +17,19 @@ import twitter4j.Status;
 public class RecordQueryAndResponse implements Action {
 	private static Logger log = LogManager.getLogger();
 	private String table;
+	private TweetDB tweetDB;
 
-	public RecordQueryAndResponse(String table) {
+	public RecordQueryAndResponse(TweetDB tweetDB, String table) {
 		this.table = table;
-		TweetDB.createTweetTable(table);
+		this.tweetDB = tweetDB;
+		tweetDB.createTweetTable(table);
 	}
 
 	@Override
-	public void procTweets(Query query, List<Status> rawTweets)
-			throws SQLException {
+	public void procTweets(Query query, List<Status> rawTweets) {
 		List<Tweet> tweets = convertStatusToTweets(rawTweets);
 		// insertSearchQuery(query);
-		TweetDB.insertTweets(table, tweets);
+		tweetDB.insertTweets(table, tweets);
 	}
 
 	public List<Tweet> convertStatusToTweets(List<Status> tweets) {

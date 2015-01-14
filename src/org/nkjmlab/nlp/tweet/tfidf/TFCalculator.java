@@ -13,6 +13,7 @@ import org.atilika.kuromoji.Tokenizer;
 import org.nkjmlab.nlp.tweet.model.Tweet;
 import org.nkjmlab.nlp.tweet.model.TweetDB;
 import org.nkjmlab.util.DateUtil;
+import org.nkjmlab.util.RDBConfig;
 
 public class TFCalculator {
 	private static Logger log = LogManager.getLogger();
@@ -20,8 +21,10 @@ public class TFCalculator {
 	public static void main(String[] args) {
 		String tableName = "CHOSHI_TWEETS";
 		String focusDay = "2014-11-30";
+		TweetDB tweetDB = new TweetDB(new RDBConfig(
+				"jdbc:h2:tcp://localhost/./tweets", "sa", ""));
 
-		List<Tweet> tweets = TweetDB.readTweets(tableName,
+		List<Tweet> tweets = tweetDB.readTweets(tableName,
 				DateUtil.parseFromTimeStamp(focusDay + " 00:00:00"),
 				DateUtil.parseFromTimeStamp(focusDay + " 23:59:59"));
 		log.info("Start extract keywords ...");
@@ -29,10 +32,16 @@ public class TFCalculator {
 		Set<String> keywords = new KeywordCalculator().extractKeywords(tweets);
 		log.info("Start calculate idfs ...");
 
-		Map<String, TF> tfs = new TFCalculator().calcValidTFs(tableName,
+		Map<String, TF> tfs = new TFCalculator(tweetDB).calcValidTFs(tableName,
 				focusDay, keywords);
 		log.info("Start write result ...");
 		log.debug(tfs);
+	}
+
+	private TweetDB tweetDB;
+
+	public TFCalculator(TweetDB tweetDB) {
+		this.tweetDB = tweetDB;
 	}
 
 	public Map<String, TF> calcValidTFs(String tableName, String focusDay,
@@ -55,7 +64,7 @@ public class TFCalculator {
 
 		String from = focusDay + " 00:00:00";
 		String to = focusDay + " 23:59:59";
-		List<Tweet> allTweets = TweetDB.readTweets("SELECT * FROM " + tableName
+		List<Tweet> allTweets = tweetDB.readTweets("SELECT * FROM " + tableName
 				+ " WHERE CREATEDAT BETWEEN ? AND ? ", from, to);
 		int allNouns = calcNumOfAllNouns(allTweets);
 		for (String term : terms) {
@@ -71,7 +80,7 @@ public class TFCalculator {
 			String term, int allNouns) {
 		String query = "%" + term + "%";
 
-		List<Tweet> tweets = TweetDB.readTweets("SELECT * FROM "
+		List<Tweet> tweets = tweetDB.readTweets("SELECT * FROM "
 				+ targetTableName
 				+ " WHERE CREATEDAT BETWEEN ? AND ? AND TEXT LIKE ? ", from,
 				to, query);

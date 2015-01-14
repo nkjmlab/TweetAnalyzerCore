@@ -7,20 +7,29 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.nkjmlab.util.RDBUtil;
+import org.nkjmlab.nlp.tweet.model.TweetDB;
+import org.nkjmlab.util.RDBConfig;
 
 public class IDFCalculator {
 	private static Logger log = LogManager.getLogger();
 
 	public static void main(String[] args) {
+		TweetDB tweetDB = new TweetDB(new RDBConfig(
+				"jdbc:h2:tcp://localhost/./tweets", "sa", ""));
 
-		List<String> terms = RDBUtil.readList(String.class,
+		List<String> terms = tweetDB.readList(String.class,
 				"SELECT WORD FROM CHOSHI_NOUNS");
 		String[] dates = { "2014-11-24", "2014-11-25", "2014-11-26",
 				"2014-11-27", "2014-11-28", "2014-11-29", "2014-11-30" };
-		Map<String, IDF> idfs = new IDFCalculator().calcIDFs("CHOSHI", dates,
-				terms);
+		Map<String, IDF> idfs = new IDFCalculator(tweetDB).calcIDFs("CHOSHI",
+				dates, terms);
 		log.debug(idfs);
+	}
+
+	private TweetDB tweetDB;
+
+	public IDFCalculator(TweetDB tweetDB) {
+		this.tweetDB = tweetDB;
 	}
 
 	public Map<String, IDF> calcValidIDFs(String tableName, String[] dates,
@@ -54,7 +63,7 @@ public class IDFCalculator {
 		String q = "%" + term + "%";
 
 		for (String date : dates) {
-			List<String> tweetsFocus = RDBUtil
+			List<String> tweetsFocus = tweetDB
 					.readList(
 							String.class,
 							"SELECT TEXT FROM "

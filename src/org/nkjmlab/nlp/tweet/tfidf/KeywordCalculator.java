@@ -7,7 +7,6 @@ import java.util.Set;
 import org.atilika.kuromoji.Token;
 import org.atilika.kuromoji.Tokenizer;
 import org.nkjmlab.nlp.tweet.model.Tweet;
-import org.nkjmlab.util.RDBUtil;
 
 public class KeywordCalculator {
 	private Tokenizer torknizer = Tokenizer.builder().build();
@@ -24,15 +23,4 @@ public class KeywordCalculator {
 		}
 		return keywords;
 	}
-
-	public void write(String keywordTable, List<String> keywords) {
-		RDBUtil.drop(keywordTable);
-		RDBUtil.create(keywordTable, "WORD VARCHAR PRIMARY KEY");
-
-		for (String keyword : keywords) {
-			RDBUtil.executeUpdate(
-					"INSERT INTO " + keywordTable + " VALUES (?)", keyword);
-		}
-	}
-
 }

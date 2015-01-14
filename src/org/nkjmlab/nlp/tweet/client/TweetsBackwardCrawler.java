@@ -1,6 +1,5 @@
-package org.nkjmlab.nlp.tweet.crawler;
+package org.nkjmlab.nlp.tweet.client;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
@@ -14,8 +13,6 @@ import twitter4j.QueryResult;
 import twitter4j.Status;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
-import twitter4j.auth.AccessToken;
 
 public class TweetsBackwardCrawler {
 
@@ -23,10 +20,10 @@ public class TweetsBackwardCrawler {
 
 	private long maxId;
 	private ScheduledFuture<?> scheduledTasks;
-	private TwitterConfig conf;
+	private Twitter twitter;
 
 	public TweetsBackwardCrawler(TwitterConfig conf) {
-		this.conf = conf;
+		this.twitter = TwitterConnector.create(conf);
 	}
 
 	/**
@@ -54,21 +51,11 @@ public class TweetsBackwardCrawler {
 			this.query.setMaxId(maxId);
 		}
 
-		private Twitter prepareTwitter() {
-			Twitter twitter = new TwitterFactory().getInstance();
-			AccessToken accessToken = new AccessToken(conf.getAccessToken(),
-					conf.getAccessTokenSecret());
-			twitter.setOAuthConsumer(conf.getConsumerKey(),
-					conf.getConsumerSecret());
-			twitter.setOAuthAccessToken(accessToken);
-			return twitter;
-		}
-
 		@Override
 		public void run() {
 			try {
 				log.debug(query);
-				QueryResult result = prepareTwitter().search(query);
+				QueryResult result = twitter.search(query);
 				List<Status> tweets = result.getTweets();
 				if (tweets.size() == 0) {
 					log.error("No Result. maxId=" + maxId);
@@ -84,7 +71,7 @@ public class TweetsBackwardCrawler {
 				log.error("Max Id is " + maxId);
 				e.printStackTrace();
 				scheduledTasks.cancel(true);
-			} catch (SQLException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 				scheduledTasks.cancel(true);
 			}

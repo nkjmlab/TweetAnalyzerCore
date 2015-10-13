@@ -14,6 +14,7 @@ public class QueryFactory {
 	 */
 	public static Query create(String searchWord, long maxId) {
 		Query query = new Query(searchWord);
+		query.setCount(100);
 		query.setMaxId(maxId);
 		return query;
 	}

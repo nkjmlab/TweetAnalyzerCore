@@ -14,8 +14,8 @@ public class IDFCalculator {
 	private static Logger log = LogManager.getLogger();
 
 	public static void main(String[] args) {
-		TweetDB tweetDB = new TweetDB(new RDBConfig(
-				"jdbc:h2:tcp://localhost/./tweets", "sa", ""));
+		TweetDB tweetDB = new TweetDB(
+				new RDBConfig("jdbc:h2:tcp://localhost/~/h2/tweets", "sa", ""));
 
 		List<String> terms = tweetDB.readList(String.class,
 				"SELECT WORD FROM CHOSHI_NOUNS");
@@ -63,13 +63,10 @@ public class IDFCalculator {
 		String q = "%" + term + "%";
 
 		for (String date : dates) {
-			List<String> tweetsFocus = tweetDB
-					.readList(
-							String.class,
-							"SELECT TEXT FROM "
-									+ tableName
-									+ " WHERE CREATEDAT BETWEEN ? AND ? AND TEXT LIKE ? ",
-							date + " 00:00:00", date + " 23:59:59", q);
+			List<String> tweetsFocus = tweetDB.readList(String.class,
+					"SELECT TEXT FROM " + tableName
+							+ " WHERE CREATEDAT BETWEEN ? AND ? AND TEXT LIKE ? ",
+					date + " 00:00:00", date + " 23:59:59", q);
 
 			daysOfAppearance = tweetsFocus.size() == 0 ? daysOfAppearance
 					: daysOfAppearance + 1;

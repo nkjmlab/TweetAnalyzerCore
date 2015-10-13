@@ -21,8 +21,8 @@ public class TFCalculator {
 	public static void main(String[] args) {
 		String tableName = "CHOSHI_TWEETS";
 		String focusDay = "2014-11-30";
-		TweetDB tweetDB = new TweetDB(new RDBConfig(
-				"jdbc:h2:tcp://localhost/./tweets", "sa", ""));
+		TweetDB tweetDB = new TweetDB(
+				new RDBConfig("jdbc:h2:tcp://localhost/~/h2/tweets", "sa", ""));
 
 		List<Tweet> tweets = tweetDB.readTweets(tableName,
 				DateUtil.parseFromTimeStamp(focusDay + " 00:00:00"),
@@ -80,10 +80,10 @@ public class TFCalculator {
 			String term, int allNouns) {
 		String query = "%" + term + "%";
 
-		List<Tweet> tweets = tweetDB.readTweets("SELECT * FROM "
-				+ targetTableName
-				+ " WHERE CREATEDAT BETWEEN ? AND ? AND TEXT LIKE ? ", from,
-				to, query);
+		List<Tweet> tweets = tweetDB.readTweets(
+				"SELECT * FROM " + targetTableName
+						+ " WHERE CREATEDAT BETWEEN ? AND ? AND TEXT LIKE ? ",
+				from, to, query);
 
 		return new TF(term, tweets.size(), allNouns);
 

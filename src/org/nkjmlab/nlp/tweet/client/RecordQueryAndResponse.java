@@ -28,7 +28,6 @@ public class RecordQueryAndResponse implements Action {
 	@Override
 	public void procTweets(Query query, List<Status> rawTweets) {
 		List<Tweet> tweets = convertStatusToTweets(rawTweets);
-		// insertSearchQuery(query);
 		tweetDB.insertTweets(table, tweets);
 	}
 
@@ -51,20 +50,20 @@ public class RecordQueryAndResponse implements Action {
 			String hashtagEntities = "#";
 
 			for (HashtagEntity hashtag : tweet.getHashtagEntities()) {
-				hashtagEntities += hashtag.getText() + ",#";
+				hashtagEntities += hashtag.getText() + " #";
 			}
 
-			String place = tweet.getPlace() == null ? null : tweet.getPlace()
-					.getName();
+			String place = tweet.getPlace() == null ? null
+					: tweet.getPlace().getName();
 			String text = tweet.getText();
-			String user = tweet.getUser() == null ? null : tweet.getUser()
-					.getScreenName();
+			String user = tweet.getUser() == null ? null
+					: tweet.getUser().getScreenName();
 
-			long retweetId = tweet.getRetweetedStatus() == null ? -1 : tweet
-					.getRetweetedStatus().getId();
+			long retweetId = tweet.getRetweetedStatus() == null ? -1
+					: tweet.getRetweetedStatus().getId();
 
-			Tweet t = new Tweet(id, createdAt, lat, lng, place, user,
-					retweetId, text, hashtagEntities);
+			Tweet t = new Tweet(id, createdAt, lat, lng, place, user, retweetId,
+					text, hashtagEntities);
 			result.add(t);
 		}
 

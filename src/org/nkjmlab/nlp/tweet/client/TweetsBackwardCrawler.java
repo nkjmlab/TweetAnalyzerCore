@@ -1,6 +1,5 @@
 package org.nkjmlab.nlp.tweet.client;
 
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -10,9 +9,7 @@ import org.apache.logging.log4j.Logger;
 
 import twitter4j.Query;
 import twitter4j.QueryResult;
-import twitter4j.Status;
 import twitter4j.Twitter;
-import twitter4j.TwitterException;
 
 public class TweetsBackwardCrawler {
 
@@ -24,6 +21,12 @@ public class TweetsBackwardCrawler {
 
 	public TweetsBackwardCrawler(TwitterConfig conf) {
 		this.twitter = TwitterConnector.create(conf);
+	}
+
+	public TweetsBackwardCrawler(String accessToken, String accessTokenSecret,
+			String consumerKey, String consumerSecret) {
+		this(new TwitterConfig(accessToken, accessTokenSecret, consumerKey,
+				consumerSecret));
 	}
 
 	/**
@@ -42,8 +45,8 @@ public class TweetsBackwardCrawler {
 	}
 
 	class TweetsSearchTask implements Runnable {
-		private final Action action;
-		private final Query query;
+		private Action action;
+		private Query query;
 
 		public TweetsSearchTask(Query query, Action action) {
 			this.action = action;
@@ -54,24 +57,22 @@ public class TweetsBackwardCrawler {
 		@Override
 		public void run() {
 			try {
+
 				log.debug(query);
 				QueryResult result = twitter.search(query);
-				List<Status> tweets = result.getTweets();
-				if (tweets.size() == 0) {
-					log.error("No Result. maxId=" + maxId);
+				action.procTweets(query, result.getTweets());
+
+				if (result.hasNext()) {
+					query = result.nextQuery();
+				} else {
+					log.info("There is no page.");
+					scheduledTasks.cancel(true);
 				}
 
-				action.procTweets(query, tweets);
-
-				for (Status tweet : tweets) {
-					maxId = tweet.getId() < maxId ? tweet.getId() : maxId;
-				}
-			} catch (TwitterException e) {
+			} catch (Exception e) {
 				log.error("Failed to search tweets: " + e.getMessage());
 				log.error("Max Id is " + maxId);
-				e.printStackTrace();
-				scheduledTasks.cancel(true);
-			} catch (Exception e) {
+				log.error(query);
 				e.printStackTrace();
 				scheduledTasks.cancel(true);
 			}

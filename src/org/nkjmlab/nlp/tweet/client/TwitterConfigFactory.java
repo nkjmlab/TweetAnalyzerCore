@@ -18,8 +18,8 @@ public class TwitterConfigFactory {
 			cfg.setIgnoreTrailingWhitespaces(true);
 			CsvEntityManager manager = new CsvEntityManager(cfg);
 
-			List<TwitterConfig> conf = manager.load(TwitterConfig.class).from(
-					file);
+			List<TwitterConfig> conf = manager.load(TwitterConfig.class)
+					.from(file);
 			return conf.get(0);
 		} catch (IOException e) {
 			e.printStackTrace();

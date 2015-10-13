@@ -27,16 +27,15 @@ public class Tweet {
 	public Tweet(long id2, Date createdAt2, double lat2, double lng2,
 			String place2, String user2, long retweetId2, String text2,
 			String hashtagEntities2) {
-		id = id2;
-		createdAt = createdAt2;
-		lat = lat2;
-		lng = lng2;
-		place = place2;
-		user = user2;
-		retweetId = retweetId2;
-		text = text2;
-		hashtagEntities = hashtagEntities2;
-
+		this.id = id2;
+		this.createdAt = createdAt2;
+		this.lat = lat2;
+		this.lng = lng2;
+		this.place = place2;
+		this.user = user2;
+		this.retweetId = retweetId2;
+		this.text = text2;
+		this.hashtagEntities = hashtagEntities2;
 	}
 
 	public long getId() {
@@ -109,6 +108,20 @@ public class Tweet {
 
 	public void setHashtagEntities(String hashtagEntities) {
 		this.hashtagEntities = hashtagEntities;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!(obj instanceof Tweet)) {
+			return false;
+		}
+		Tweet t = (Tweet) obj;
+		return this.id == t.id;
+	}
+
+	@Override
+	public int hashCode() {
+		return (int) this.id;
 	}
 
 	@Override

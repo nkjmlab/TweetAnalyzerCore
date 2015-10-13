@@ -2,6 +2,7 @@ package org.nkjmlab.nlp.tweet.model;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,13 +28,18 @@ public class TweetDB {
 	}
 
 	public TweetDB(RDBConfig conf) {
-		this.rdb = new RDBUtil(conf);
+		this(new RDBUtil(conf));
+	}
+
+	public TweetDB(String jdbcURL, String username, String password) {
+		this(new RDBConfig(jdbcURL, username, password));
 	}
 
 	public List<Tweet> readTweets(String table, Date from, Date to) {
-		return readTweets("SELECT * FROM " + table
-				+ " WHERE CREATEDAT BETWEEN ? AND ?", DateUtil.format(from),
-				DateUtil.format(to));
+		return readTweets(
+				"SELECT * FROM " + table
+						+ " WHERE CREATEDAT BETWEEN ? AND ? ORDER BY CREATEDAT",
+				DateUtil.format(from), DateUtil.format(to));
 	}
 
 	public List<Tweet> readTweets(String sql, Object... objs) {
@@ -48,7 +54,7 @@ public class TweetDB {
 		}
 		String sql = "INSERT INTO " + table + " VALUES (?,?,?,?,?,?,?,?,?)";
 		rdb.executeUpdate(sql, t.getId(), t.getCreatedAt(), t.getLat(),
-				t.getLat(), t.getPlace(), t.getUser(), t.getRetweetId(),
+				t.getLng(), t.getPlace(), t.getUser(), t.getRetweetId(),
 				t.getText(), t.getHashtagEntities());
 	}
 
@@ -76,11 +82,15 @@ public class TweetDB {
 	}
 
 	public void drop(String tableName) {
-		this.rdb.drop(tableName);
+		this.rdb.dropIfExists(tableName);
 	}
 
 	public <T> List<T> readList(Class<T> clazz, String sql, Object... objs) {
 		return this.rdb.readList(clazz, sql, objs);
+	}
+
+	public <T> T readByPrimaryKey(Class<T> clazz, Object primaryKeyValue) {
+		return this.rdb.readByPrimaryKey(clazz, primaryKeyValue);
 	}
 
 	public void executeUpdate(String sql, Object... objs) {
@@ -89,6 +99,18 @@ public class TweetDB {
 
 	public void create(String tableName, String schema) {
 		this.rdb.create(tableName, schema);
+	}
+
+	public List<Map<String, Object>> readMapList(String sql, Object... objs) {
+		return this.rdb.readMapList(sql, objs);
+	}
+
+	public void insert(Object obj) {
+		this.rdb.insert(obj);
+	}
+
+	public <T> T read(Class<T> clazz, String sql, Object... objs) {
+		return rdb.read(clazz, sql, objs);
 	}
 
 }

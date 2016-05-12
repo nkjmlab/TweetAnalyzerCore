@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.nkjmlab.twitter</groupId>
 	<version>0.0.3-SNAPSHOT</version>
@@ -15,25 +16,11 @@
 			<url>http://www.atilika.org/nexus/content/repositories/atilika</url>
 		</repository>
 	</repositories>
-	<scm>
-		<connection>scm:git:https://github.com/nkjmlab/TweetAnalyzerCore.git</connection>
-		<developerConnection>scm:git:https://github.com/nkjmlab/TweetAnalyzerCore.git</developerConnection>
-		<url>https://github.com/nkjmlab/TweetAnalyzerCore</url>
-		<tag>HEAD</tag>
-	</scm>
-	<distributionManagement>
-		<repository>
-			<id>nkjmlab-releases</id>
-			<url>http://maven.nkjmlab.org/nexus/content/repositories/nkjmlab-releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>nkjmlab-snapshots</id>
-			<url>http://maven.nkjmlab.org/nexus/content/repositories/nkjmlab-snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
 	<properties>
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.javadoc.skip>true</maven.javadoc.skip>
+		<additionalparam>-Xdoclint:none</additionalparam>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -71,8 +58,26 @@
 			<artifactId>twitter4j-core</artifactId>
 			<version>4.0.4</version>
 		</dependency>
-
 	</dependencies>
+	<!-- ********** for Remote Deploy START ******* -->
+	<scm>
+		<connection>scm:git:https://github.com/nkjmlab/TweetAnalyzerCore.git</connection>
+		<developerConnection>scm:git:https://github.com/nkjmlab/TweetAnalyzerCore.git</developerConnection>
+		<url>https://github.com/nkjmlab/TweetAnalyzerCore</url>
+		<tag>HEAD</tag>
+	</scm>
+	<distributionManagement>
+		<repository>
+			<id>nkjmlab-releases</id>
+			<url>http://maven.nkjmlab.org/nexus/content/repositories/nkjmlab-releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>nkjmlab-snapshots</id>
+			<url>http://maven.nkjmlab.org/nexus/content/repositories/nkjmlab-snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+	<!-- ********** for Remote Deploy END ******* -->
+
 	<build>
 		<plugins>
 			<plugin>
@@ -89,7 +94,7 @@
 					<downloadSources>true</downloadSources>
 				</configuration>
 			</plugin>
-
+			<!-- ********** for Remote Deploy START ******* -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
@@ -113,6 +118,7 @@
 					</execution>
 				</executions>
 			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
@@ -143,6 +149,7 @@
 					<skipStaging>true</skipStaging>
 				</configuration>
 			</plugin>
+			<!-- ********** for Remote Deploy END ******* -->
 		</plugins>
 	</build>
 	<artifactId>org.nkjmlab.twitter</artifactId>

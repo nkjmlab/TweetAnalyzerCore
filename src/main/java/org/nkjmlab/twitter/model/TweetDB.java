@@ -1,5 +1,6 @@
-package org.nkjmlab.nlp.tweet.model;
+package org.nkjmlab.twitter.model;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -7,8 +8,9 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.nkjmlab.util.DateUtil;
-import org.nkjmlab.util.RDBConfig;
-import org.nkjmlab.util.RDBUtil;
+import org.nkjmlab.util.rdb.RDBConfig;
+import org.nkjmlab.util.rdb.RDBUtil;
+import org.nkjmlab.util.rdb.RDBUtilWithConnectionPool;
 
 public class TweetDB {
 	private static Logger log = LogManager.getLogger();
@@ -23,16 +25,22 @@ public class TweetDB {
 
 	}
 
+	/**
+	 *
+	 * @param dbName
+	 *            データベースファイル
+	 */
+	public TweetDB(File dbFile) {
+		this(new RDBConfig(dbFile));
+	}
+
 	public TweetDB(RDBUtil rdb) {
 		this.rdb = rdb;
+		rdb.useDatabaseServer();
 	}
 
 	public TweetDB(RDBConfig conf) {
-		this(new RDBUtil(conf));
-	}
-
-	public TweetDB(String jdbcURL, String username, String password) {
-		this(new RDBConfig(jdbcURL, username, password));
+		this(new RDBUtilWithConnectionPool(conf));
 	}
 
 	public List<Tweet> readTweets(String table, Date from, Date to) {
@@ -81,7 +89,7 @@ public class TweetDB {
 		}
 	}
 
-	public void drop(String tableName) {
+	public void dropIfExists(String tableName) {
 		this.rdb.dropIfExists(tableName);
 	}
 
@@ -97,8 +105,8 @@ public class TweetDB {
 		this.rdb.executeUpdate(sql, objs);
 	}
 
-	public void create(String tableName, String schema) {
-		this.rdb.create(tableName, schema);
+	public void createTableIfNotExists(String schema) {
+		this.rdb.createTableIfNotExists(schema);
 	}
 
 	public List<Map<String, Object>> readMapList(String sql, Object... objs) {

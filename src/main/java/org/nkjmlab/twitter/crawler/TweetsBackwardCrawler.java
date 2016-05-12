@@ -1,21 +1,23 @@
-package org.nkjmlab.nlp.tweet.client;
+package org.nkjmlab.twitter.crawler;
 
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.nkjmlab.twitter.conn.TwitterConfig;
+import org.nkjmlab.twitter.conn.TwitterConnector;
 
 import twitter4j.Query;
 import twitter4j.QueryResult;
+import twitter4j.Status;
 import twitter4j.Twitter;
 
 public class TweetsBackwardCrawler {
 
-	private static Logger log = LogManager.getLogger();
+	private static org.apache.logging.log4j.Logger log = org.apache.logging.log4j.LogManager
+			.getLogger();
 
-	private long maxId;
 	private ScheduledFuture<?> scheduledTasks;
 	private Twitter twitter;
 
@@ -35,9 +37,8 @@ public class TweetsBackwardCrawler {
 	 * @param action
 	 * @param query
 	 */
-	public void crawlTweets(Query query, Action action) {
-		this.maxId = query.getMaxId() != -1l ? query.getMaxId()
-				: Long.MAX_VALUE;
+	public void crawlTweets(Query query, ProcedureForCollectedTweets action) {
+
 		this.scheduledTasks = Executors.newSingleThreadScheduledExecutor()
 				.scheduleWithFixedDelay(new TweetsSearchTask(query, action), 0,
 						5, TimeUnit.SECONDS);
@@ -45,13 +46,12 @@ public class TweetsBackwardCrawler {
 	}
 
 	class TweetsSearchTask implements Runnable {
-		private Action action;
+		private ProcedureForCollectedTweets action;
 		private Query query;
 
-		public TweetsSearchTask(Query query, Action action) {
+		public TweetsSearchTask(Query query, ProcedureForCollectedTweets action) {
 			this.action = action;
 			this.query = query;
-			this.query.setMaxId(maxId);
 		}
 
 		@Override
@@ -60,18 +60,17 @@ public class TweetsBackwardCrawler {
 
 				log.debug(query);
 				QueryResult result = twitter.search(query);
-				action.procTweets(query, result.getTweets());
+				List<Status> tweets = result.getTweets();
+				action.apply(query, tweets);
 
 				if (result.hasNext()) {
 					query = result.nextQuery();
 				} else {
-					log.info("There is no page.");
-					scheduledTasks.cancel(true);
+					this.query.setMaxId(tweets.get(tweets.size() - 1).getId());
 				}
-
 			} catch (Exception e) {
-				log.error("Failed to search tweets: " + e.getMessage());
-				log.error("Max Id is " + maxId);
+				log.error("Failed to search tweets: {}.", e.getMessage());
+				log.error("Max Id is " + query.getMaxId());
 				log.error(query);
 				e.printStackTrace();
 				scheduledTasks.cancel(true);

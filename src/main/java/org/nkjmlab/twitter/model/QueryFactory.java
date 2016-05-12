@@ -1,4 +1,4 @@
-package org.nkjmlab.nlp.tweet;
+package org.nkjmlab.twitter.model;
 
 import twitter4j.GeoLocation;
 import twitter4j.Query;
@@ -6,7 +6,18 @@ import twitter4j.Query;
 public class QueryFactory {
 
 	/**
-	 * 検索語を含むツイートを取得します．maxIdから遡って取得します．
+	 * 検索語を含むツイートを取得するクエリを作成します．
+	 *
+	 * @param searchWord
+	 * @param maxId
+	 * @return
+	 */
+	public static Query create(String searchWord) {
+		return create(searchWord, Long.MAX_VALUE);
+	}
+
+	/**
+	 * 検索語を含むツイートを取得します．maxIdから遡って取得するクエリを作成します．
 	 *
 	 * @param searchWord
 	 * @param maxId
@@ -20,7 +31,7 @@ public class QueryFactory {
 	}
 
 	/**
-	 * lat,lngを中心として半径radiusキロメートル内の検索語を含むツイートを取得します．maxIdから遡って取得します．
+	 * lat,lngを中心として半径radiusキロメートル内の検索語を含むツイートを取得します．maxIdから遡って取得するクエリをを作成します．
 	 *
 	 * @param searchWord
 	 * @param lat

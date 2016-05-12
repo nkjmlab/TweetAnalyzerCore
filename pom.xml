@@ -18,8 +18,8 @@
 	</repositories>
 	<scm>
 		<url>https://github.com/nkjmlab/TweetAnalyzerCore</url>
-		<connection>scm:git:https://github.com/nkjmlab/TweetAnalyzerCore.git</connection>
-		<developerConnection>scm:git:https://github.com/nkjmlab/TweetAnalyzerCore.git</developerConnection>
+		<connection>scm:git:git@github.com:nkjmlab/TweetAnalyzerCore.git</connection>
+		<developerConnection>scm:git:git@github.com:nkjmlab/TweetAnalyzerCore.git</developerConnection>
 	</scm>
 	<distributionManagement>
 		<repository>

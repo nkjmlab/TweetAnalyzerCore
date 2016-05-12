@@ -17,7 +17,7 @@
 		</repository>
 	</repositories>
 	<scm>
-		<url>https://github.com/nkjmlab/TweetAnalyzerCore</url>
+		<url>git@github.com:nkjmlab/TweetAnalyzerCore.git</url>
 		<connection>scm:git:git@github.com:nkjmlab/TweetAnalyzerCore.git</connection>
 		<developerConnection>scm:git:git@github.com:nkjmlab/TweetAnalyzerCore.git</developerConnection>
 	</scm>

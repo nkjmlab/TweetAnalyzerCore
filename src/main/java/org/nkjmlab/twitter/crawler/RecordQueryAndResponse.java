@@ -9,7 +9,7 @@ import twitter4j.Query;
 import twitter4j.Status;
 
 public class RecordQueryAndResponse implements ProcedureForCollectedTweets {
-	private static org.apache.logging.log4j.Logger log = org.apache.logging.log4j.LogManager
+	protected static org.apache.logging.log4j.Logger log = org.apache.logging.log4j.LogManager
 			.getLogger();
 	private String tableName;
 	private TweetDB tweetDB;

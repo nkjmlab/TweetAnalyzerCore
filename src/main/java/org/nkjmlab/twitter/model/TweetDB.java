@@ -1,29 +1,21 @@
 package org.nkjmlab.twitter.model;
 
 import java.io.File;
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.nkjmlab.util.DateUtil;
-import org.nkjmlab.util.rdb.RDBConfig;
-import org.nkjmlab.util.rdb.RDBUtil;
-import org.nkjmlab.util.rdb.RDBUtilWithConnectionPool;
+import org.nkjmlab.util.db.DbClient;
+import org.nkjmlab.util.db.DbClientFactory;
+import org.nkjmlab.util.db.DbConfig;
+import org.nkjmlab.util.db.H2ConfigFactory;
+import org.nkjmlab.util.db.H2Server;
 
 public class TweetDB {
 	private static Logger log = LogManager.getLogger();
-	private RDBUtil rdb;
-
-	public void main(String[] args) {
-
-		List<Tweet> tweets = readTweets("CHOSHI_TWEETS",
-				DateUtil.parseFromTimeStamp("2014-11-24" + " 00:00:00"),
-				DateUtil.parseFromTimeStamp("2014-11-24" + " 23:59:59"));
-		System.out.println(tweets);
-
-	}
+	private DbClient rdb;
 
 	/**
 	 *
@@ -31,23 +23,19 @@ public class TweetDB {
 	 *            データベースファイル
 	 */
 	public TweetDB(File dbFile) {
-		this(new RDBConfig(dbFile));
+		this(H2ConfigFactory.create(dbFile));
 	}
 
-	public TweetDB(RDBUtil rdb) {
-		this.rdb = rdb;
-		rdb.useDatabaseServer();
+	public TweetDB(DbConfig conf) {
+		this.rdb = DbClientFactory.createSimpleClient(conf);
+		H2Server.start();
 	}
 
-	public TweetDB(RDBConfig conf) {
-		this(new RDBUtilWithConnectionPool(conf));
-	}
-
-	public List<Tweet> readTweets(String table, Date from, Date to) {
+	public List<Tweet> readTweets(String table, Timestamp from, Timestamp to) {
 		return readTweets(
 				"SELECT * FROM " + table
 						+ " WHERE CREATEDAT BETWEEN ? AND ? ORDER BY CREATEDAT",
-				DateUtil.format(from), DateUtil.format(to));
+				from, to);
 	}
 
 	public List<Tweet> readTweets(String sql, Object... objs) {
@@ -89,8 +77,8 @@ public class TweetDB {
 		}
 	}
 
-	public void dropIfExists(String tableName) {
-		this.rdb.dropIfExists(tableName);
+	public void dropTableIfExists(String tableName) {
+		this.rdb.dropTableIfExists(tableName);
 	}
 
 	public <T> List<T> readList(Class<T> clazz, String sql, Object... objs) {

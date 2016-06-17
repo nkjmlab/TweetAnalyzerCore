@@ -12,7 +12,7 @@ import twitter4j.Query;
 
 public class TweetsRecorder {
 
-	private static org.apache.logging.log4j.Logger log = org.apache.logging.log4j.LogManager
+	protected static org.apache.logging.log4j.Logger log = org.apache.logging.log4j.LogManager
 			.getLogger();
 
 	public static void main(String[] args) {

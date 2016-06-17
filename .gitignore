@@ -2,3 +2,4 @@
 /target/
 /.settings/org.eclipse.m2e.core.prefs
 /src/main/config/twitter.conf
+/src/main/resources/twitter.conf

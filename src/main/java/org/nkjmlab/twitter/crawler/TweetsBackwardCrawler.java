@@ -2,6 +2,7 @@ package org.nkjmlab.twitter.crawler;
 
 import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -18,8 +19,10 @@ public class TweetsBackwardCrawler {
 	private static org.apache.logging.log4j.Logger log = org.apache.logging.log4j.LogManager
 			.getLogger();
 
-	private ScheduledFuture<?> scheduledTasks;
 	private Twitter twitter;
+
+	private ScheduledExecutorService executorService;
+	private ScheduledFuture<?> scheduledTasks;
 
 	public TweetsBackwardCrawler(TwitterConfig conf) {
 		this.twitter = TwitterConnector.create(conf);
@@ -39,9 +42,9 @@ public class TweetsBackwardCrawler {
 	 */
 	public void crawlTweets(Query query, ProcedureForCollectedTweets action) {
 
-		this.scheduledTasks = Executors.newSingleThreadScheduledExecutor()
-				.scheduleWithFixedDelay(new TweetsSearchTask(query, action), 0,
-						5, TimeUnit.SECONDS);
+		this.executorService = Executors.newSingleThreadScheduledExecutor();
+		this.scheduledTasks = executorService.scheduleWithFixedDelay(
+				new TweetsSearchTask(query, action), 0, 5, TimeUnit.SECONDS);
 
 	}
 
@@ -49,7 +52,8 @@ public class TweetsBackwardCrawler {
 		private ProcedureForCollectedTweets action;
 		private Query query;
 
-		public TweetsSearchTask(Query query, ProcedureForCollectedTweets action) {
+		public TweetsSearchTask(Query query,
+				ProcedureForCollectedTweets action) {
 			this.action = action;
 			this.query = query;
 		}
@@ -57,23 +61,30 @@ public class TweetsBackwardCrawler {
 		@Override
 		public void run() {
 			try {
-
 				log.debug(query);
 				QueryResult result = twitter.search(query);
 				List<Status> tweets = result.getTweets();
-				action.apply(query, tweets);
+				if (tweets.size() == 0) {
+					log.info("Finish backward search.");
+					scheduledTasks.cancel(true);
+					executorService.shutdown();
+					return;
+				}
 
+				action.apply(query, tweets);
 				if (result.hasNext()) {
 					query = result.nextQuery();
 				} else {
-					this.query.setMaxId(tweets.get(tweets.size() - 1).getId());
+					this.query.setMaxId(
+							tweets.get(tweets.size() - 1).getId() - 1);
 				}
 			} catch (Exception e) {
 				log.error("Failed to search tweets: {}.", e.getMessage());
-				log.error("Max Id is " + query.getMaxId());
-				log.error(query);
-				e.printStackTrace();
+				log.error("Max Id is {}", query.getMaxId());
+				log.error("Query is {}", query);
+				log.error(e, e);
 				scheduledTasks.cancel(true);
+				executorService.shutdown();
 			}
 		}
 

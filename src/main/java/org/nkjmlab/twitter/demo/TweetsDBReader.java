@@ -13,7 +13,7 @@ public class TweetsDBReader {
 
 	public static void main(String[] args) {
 
-		TweetDB tweetDB = new TweetDB(FileUtils.createTempFile("tweetsDB"));
+		TweetDB tweetDB = new TweetDB(FileUtils.getTempFile("tweetsDB"));
 
 		List<Tweet> tweets = tweetDB.readTweets("SELECT * FROM TWEETS LIMIT ?",
 				10);

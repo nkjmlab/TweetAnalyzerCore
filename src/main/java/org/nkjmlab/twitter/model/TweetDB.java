@@ -34,12 +34,8 @@ public class TweetDB {
 		this.dbClient = DbClientFactory.createSimpleClient(conf);
 	}
 
-	public List<Tweet> readTweetsBetween(String table, Timestamp from,
-			Timestamp to) {
-		return readTweets(
-				"SELECT * FROM " + table
-						+ " WHERE CREATEDAT BETWEEN ? AND ? ORDER BY CREATEDAT",
-				from, to);
+	public List<Tweet> readTweetsBetween(String table, Timestamp from, Timestamp to) {
+		return readTweets("SELECT * FROM " + table + " WHERE CREATEDAT BETWEEN ? AND ? ORDER BY CREATEDAT", from, to);
 	}
 
 	public List<Tweet> readTweets(String sql, Object... objs) {
@@ -48,25 +44,20 @@ public class TweetDB {
 	}
 
 	public void insertTweet(String table, Tweet tweet) {
-		if (dbClient.read(Tweet.class, "SELECT * FROM " + table + " WHERE ID=?",
-				tweet.getId()) != null) {
+		if (dbClient.read(Tweet.class, "SELECT * FROM " + table + " WHERE ID=?", tweet.getId()) != null) {
 			return;
 		}
 		String sql = "INSERT INTO " + table + " VALUES (?,?,?,?,?,?,?,?,?)";
-		dbClient.executeUpdate(sql, tweet.getId(), tweet.getCreatedAt(),
-				tweet.getLat(), tweet.getLng(), tweet.getPlace(),
-				tweet.getUser(), tweet.getRetweetId(), tweet.getText(),
-				tweet.getHashtagEntities());
+		dbClient.executeUpdate(sql, tweet.getId(), tweet.getCreatedAt(), tweet.getLat(), tweet.getLng(),
+				tweet.getPlace(), tweet.getUser(), tweet.getRetweetId(), tweet.getText(), tweet.getHashtagEntities());
 	}
 
 	public void createTweetTable(String tableName) {
-		dbClient.createTableIfNotExists(tableName + "(id long PRIMARY KEY,"
-				+ "createdAt TIMESTAMP," + "lat DOUBLE," + "lng DOUBLE,"
-				+ "place VARCHAR," + "user VARCHAR," + "retweetId long, "
-				+ "text VARCHAR," + "hashtagEntities VARCHAR)");
+		dbClient.createTableIfNotExists(tableName + "(id long PRIMARY KEY," + "createdAt TIMESTAMP," + "lat DOUBLE,"
+				+ "lng DOUBLE," + "place VARCHAR," + "user VARCHAR," + "retweetId long, " + "text VARCHAR,"
+				+ "hashtagEntities VARCHAR)");
 
-		dbClient.createIndexIfNotExists(tableName + "_createdAt", tableName,
-				"createdAt");
+		dbClient.createIndexIfNotExists(tableName + "_createdAt", tableName, "createdAt");
 
 		dbClient.createIndexIfNotExists(tableName + "_user", tableName, "user");
 

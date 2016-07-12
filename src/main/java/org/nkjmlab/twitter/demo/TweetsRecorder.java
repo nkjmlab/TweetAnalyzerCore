@@ -21,7 +21,7 @@ public class TweetsRecorder {
 		Query query = QueryFactory.create("人身事故");
 
 		crawler.crawlTweets(query, new RecordQueryAndResponse(
-				new TweetDB(FileUtils.createTempFile("tweetsDB")), "TWEETS"));
+				new TweetDB(FileUtils.getTempFile("tweetsDB")), "TWEETS"));
 	}
 
 }

@@ -1,10 +1,10 @@
 package org.nkjmlab.twitter.demo;
 
-import java.io.File;
 import java.util.List;
 
 import org.nkjmlab.twitter.model.Tweet;
 import org.nkjmlab.twitter.model.TweetDB;
+import org.nkjmlab.util.io.FileUtils;
 
 public class TweetsDBReader {
 
@@ -13,8 +13,7 @@ public class TweetsDBReader {
 
 	public static void main(String[] args) {
 
-		TweetDB tweetDB = new TweetDB(
-				new File(System.getProperty("java.io.tmpdir"), "tweetsDB"));
+		TweetDB tweetDB = new TweetDB(FileUtils.createTempFile("tweetsDB"));
 
 		List<Tweet> tweets = tweetDB.readTweets("SELECT * FROM TWEETS LIMIT ?",
 				10);

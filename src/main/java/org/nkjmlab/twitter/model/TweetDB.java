@@ -2,6 +2,7 @@ package org.nkjmlab.twitter.model;
 
 import java.io.File;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -15,23 +16,26 @@ import org.nkjmlab.util.db.H2Server;
 
 public class TweetDB {
 	private static Logger log = LogManager.getLogger();
-	private DbClient rdb;
+	private DbClient dbClient;
+
+	static {
+		H2Server.start();
+	}
 
 	/**
 	 *
-	 * @param dbName
-	 *            データベースファイル
+	 * @param dbFile
 	 */
 	public TweetDB(File dbFile) {
 		this(H2ConfigFactory.create(dbFile));
 	}
 
 	public TweetDB(DbConfig conf) {
-		this.rdb = DbClientFactory.createSimpleClient(conf);
-		H2Server.start();
+		this.dbClient = DbClientFactory.createSimpleClient(conf);
 	}
 
-	public List<Tweet> readTweets(String table, Timestamp from, Timestamp to) {
+	public List<Tweet> readTweetsBetween(String table, Timestamp from,
+			Timestamp to) {
 		return readTweets(
 				"SELECT * FROM " + table
 						+ " WHERE CREATEDAT BETWEEN ? AND ? ORDER BY CREATEDAT",
@@ -39,74 +43,74 @@ public class TweetDB {
 	}
 
 	public List<Tweet> readTweets(String sql, Object... objs) {
-		List<Tweet> tweets = rdb.readList(Tweet.class, sql, objs);
+		List<Tweet> tweets = dbClient.readList(Tweet.class, sql, objs);
 		return tweets;
 	}
 
-	public void insertTweet(String table, Tweet t) {
-		if (rdb.read(Tweet.class, "SELECT * FROM " + table + " WHERE ID=?",
-				t.getId()) != null) {
+	public void insertTweet(String table, Tweet tweet) {
+		if (dbClient.read(Tweet.class, "SELECT * FROM " + table + " WHERE ID=?",
+				tweet.getId()) != null) {
 			return;
 		}
 		String sql = "INSERT INTO " + table + " VALUES (?,?,?,?,?,?,?,?,?)";
-		rdb.executeUpdate(sql, t.getId(), t.getCreatedAt(), t.getLat(),
-				t.getLng(), t.getPlace(), t.getUser(), t.getRetweetId(),
-				t.getText(), t.getHashtagEntities());
+		dbClient.executeUpdate(sql, tweet.getId(), tweet.getCreatedAt(),
+				tweet.getLat(), tweet.getLng(), tweet.getPlace(),
+				tweet.getUser(), tweet.getRetweetId(), tweet.getText(),
+				tweet.getHashtagEntities());
 	}
 
 	public void createTweetTable(String tableName) {
-		String schema = "id long PRIMARY KEY," + "createdAt TIMESTAMP,"
-				+ "lat DOUBLE," + "lng DOUBLE," + "place VARCHAR,"
-				+ "user VARCHAR," + "retweetId long, " + "text VARCHAR,"
-				+ "hashtagEntities VARCHAR, ";
-		rdb.executeUpdate("CREATE TABLE IF NOT EXISTS " + tableName + " ("
-				+ schema + ")");
+		dbClient.createTableIfNotExists(tableName + "(id long PRIMARY KEY,"
+				+ "createdAt TIMESTAMP," + "lat DOUBLE," + "lng DOUBLE,"
+				+ "place VARCHAR," + "user VARCHAR," + "retweetId long, "
+				+ "text VARCHAR," + "hashtagEntities VARCHAR)");
 
-		rdb.executeUpdate("CREATE INDEX IF NOT EXISTS " + tableName
-				+ "_createdAt ON " + tableName + "(createdAt)");
+		dbClient.createIndexIfNotExists(tableName + "_createdAt", tableName,
+				"createdAt");
 
-		rdb.executeUpdate("CREATE INDEX IF NOT EXISTS " + tableName
-				+ "_user ON " + tableName + "(user)");
+		dbClient.createIndexIfNotExists(tableName + "_user", tableName, "user");
 
 	}
 
 	public void insertTweets(String table, List<Tweet> tweets) {
+		List<Long> ids = new ArrayList<>();
 		for (Tweet t : tweets) {
 			insertTweet(table, t);
-			log.debug(t.getId());
+			ids.add(t.getId());
 		}
+		log.debug("try to insert tweet ids =>{}", ids);
 	}
 
 	public void dropTableIfExists(String tableName) {
-		this.rdb.dropTableIfExists(tableName);
+		this.dbClient.dropTableIfExists(tableName);
 	}
 
 	public <T> List<T> readList(Class<T> clazz, String sql, Object... objs) {
-		return this.rdb.readList(clazz, sql, objs);
+		return this.dbClient.readList(clazz, sql, objs);
 	}
 
 	public <T> T readByPrimaryKey(Class<T> clazz, Object primaryKeyValue) {
-		return this.rdb.readByPrimaryKey(clazz, primaryKeyValue);
+		return this.dbClient.readByPrimaryKey(clazz, primaryKeyValue);
 	}
 
 	public void executeUpdate(String sql, Object... objs) {
-		this.rdb.executeUpdate(sql, objs);
+		this.dbClient.executeUpdate(sql, objs);
 	}
 
 	public void createTableIfNotExists(String schema) {
-		this.rdb.createTableIfNotExists(schema);
+		this.dbClient.createTableIfNotExists(schema);
 	}
 
 	public List<Map<String, Object>> readMapList(String sql, Object... objs) {
-		return this.rdb.readMapList(sql, objs);
+		return this.dbClient.readMapList(sql, objs);
 	}
 
 	public void insert(Object obj) {
-		this.rdb.insert(obj);
+		this.dbClient.insert(obj);
 	}
 
 	public <T> T read(Class<T> clazz, String sql, Object... objs) {
-		return rdb.read(clazz, sql, objs);
+		return dbClient.read(clazz, sql, objs);
 	}
 
 }

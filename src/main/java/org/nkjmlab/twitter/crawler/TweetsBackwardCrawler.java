@@ -61,7 +61,7 @@ public class TweetsBackwardCrawler {
 		@Override
 		public void run() {
 			try {
-				log.debug(query);
+				log.debug("query is {}", query);
 				QueryResult result = twitter.search(query);
 				List<Status> tweets = result.getTweets();
 				if (tweets.size() == 0) {

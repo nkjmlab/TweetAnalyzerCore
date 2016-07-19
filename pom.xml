@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.nkjmlab</groupId>
 		<artifactId>nkjmlab-parent</artifactId>
-		<version>0.0.1</version>
+		<version>0.0.2-SNAPSHOT</version>
 	</parent>
 	<artifactId>nkjmlab-twitter</artifactId>
 	<version>0.0.4-SNAPSHOT</version>

@@ -116,17 +116,19 @@ public class Tweet {
 	}
 
 	@Override
+	public int hashCode() {
+		return (int) this.id;
+	}
+
+	@Override
 	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
 		if (!(obj instanceof Tweet)) {
 			return false;
 		}
 		Tweet t = (Tweet) obj;
 		return this.id == t.id;
-	}
-
-	@Override
-	public int hashCode() {
-		return (int) this.id;
 	}
 
 	@Override

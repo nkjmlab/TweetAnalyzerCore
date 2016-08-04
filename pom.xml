@@ -6,7 +6,7 @@
 		<artifactId>nkjmlab-parent</artifactId>
 		<version>0.0.2-SNAPSHOT</version>
 	</parent>
-	<artifactId>nkjmlab-twitter</artifactId>
+	<artifactId>nkjmlab-twitter-core</artifactId>
 	<version>0.0.4-SNAPSHOT</version>
 	<repositories>
 		<repository>
@@ -16,8 +16,8 @@
 	</repositories>
 	<!-- ********** for Remote Deploy START ******* -->
 	<scm>
-		<connection>scm:git:https://github.com/nkjmlab/TweetAnalyzerCore.git</connection>
-		<url>https://github.com/nkjmlab/TweetAnalyzerCore</url>
+		<connection>scm:git:git@github.com:nkjmlab/nkjmlab-twitter-core.git</connection>
+		<url>https://github.com/nkjmlab/nkjmlab-twitter-core</url>
 		<tag>HEAD</tag>
 	</scm>
 	<!-- ********** for Remote Deploy END ******* -->

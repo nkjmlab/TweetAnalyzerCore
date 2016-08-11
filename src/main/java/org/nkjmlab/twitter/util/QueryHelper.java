@@ -1,9 +1,9 @@
-package org.nkjmlab.twitter.model;
+package org.nkjmlab.twitter.util;
 
 import twitter4j.GeoLocation;
 import twitter4j.Query;
 
-public class QueryFactory {
+public class QueryHelper {
 
 	/**
 	 * 検索語を含むツイートを取得するクエリを作成します．
@@ -35,17 +35,15 @@ public class QueryFactory {
 	 *
 	 * @param searchWord
 	 * @param lat
-	 * @param lng
+	 * @param lon
 	 * @param radius
 	 * @param maxId
 	 * @return
 	 */
-	public static Query createQuery(String searchWord, double lat, double lng,
+	public static Query createQuery(String searchWord, double lat, double lon,
 			double radius, long maxId) {
-
 		Query query = create(searchWord, maxId);
-		query.setGeoCode(new GeoLocation(lat, lng), radius, Query.KILOMETERS);
-
+		query.setGeoCode(new GeoLocation(lat, lon), radius, Query.KILOMETERS);
 		return query;
 	}
 }

@@ -1,15 +1,16 @@
 package org.nkjmlab.twitter.model;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import net.sf.persist.annotations.NoTable;
 import twitter4j.GeoLocation;
-import twitter4j.HashtagEntity;
 import twitter4j.Status;
 
 @NoTable
@@ -19,7 +20,7 @@ public class Tweet {
 
 	private Date createdAt;
 	private double lat;
-	private double lng;
+	private double lon;
 	private String place;
 	private String user;
 	private long retweetId;
@@ -29,18 +30,23 @@ public class Tweet {
 	public Tweet() {
 	}
 
-	public Tweet(long id2, Date createdAt2, double lat2, double lng2,
-			String place2, String user2, long retweetId2, String text2,
-			String hashtagEntities2) {
-		this.id = id2;
-		this.createdAt = createdAt2;
-		this.lat = lat2;
-		this.lng = lng2;
-		this.place = place2;
-		this.user = user2;
-		this.retweetId = retweetId2;
-		this.text = text2;
-		this.hashtagEntities = hashtagEntities2;
+	public Tweet(long id, Date createdAt, double lat, double lon, String place, String user,
+			long retweetId, String text, String hashtagEntities) {
+		this.id = id;
+		this.createdAt = createdAt;
+		this.lat = lat;
+		this.lon = lon;
+		this.place = place;
+		this.user = user;
+		this.retweetId = retweetId;
+		this.text = text;
+		this.hashtagEntities = hashtagEntities;
+	}
+
+	public static String getRelationalSchema() {
+		return "(id long PRIMARY KEY," + "createdAt TIMESTAMP," + "lat DOUBLE,"
+				+ "lon DOUBLE," + "place VARCHAR," + "user VARCHAR," + "retweetId long, "
+				+ "text VARCHAR," + "hashtagEntities VARCHAR)";
 	}
 
 	public long getId() {
@@ -67,12 +73,12 @@ public class Tweet {
 		this.lat = lat;
 	}
 
-	public double getLng() {
-		return lng;
+	public double getLon() {
+		return lon;
 	}
 
-	public void setLng(double lng) {
-		this.lng = lng;
+	public void setLon(double lon) {
+		this.lon = lon;
 	}
 
 	public String getPlace() {
@@ -115,66 +121,32 @@ public class Tweet {
 		this.hashtagEntities = hashtagEntities;
 	}
 
-	@Override
-	public int hashCode() {
-		return (int) this.id;
+	public static List<Tweet> convertStatusToTweets(Collection<Status> tweets) {
+		return tweets.stream().map(s -> convertStatusToTweet(s)).collect(Collectors.toList());
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!(obj instanceof Tweet)) {
-			return false;
-		}
-		Tweet t = (Tweet) obj;
-		return this.id == t.id;
+	public static Tweet convertStatusToTweet(Status status) {
+		long id = status.getId();
+		Date createdAt = status.getCreatedAt();
+		GeoLocation geoLocation = status.getGeoLocation();
+		double lat = geoLocation == null ? 0.0 : geoLocation.getLatitude();
+		double lon = geoLocation == null ? 0.0 : geoLocation.getLongitude();
+
+		String place = status.getPlace() == null ? null : status.getPlace().getName();
+		String user = status.getUser() == null ? null : status.getUser().getScreenName();
+		long retweetId = status.getRetweetedStatus() == null ? -1
+				: status.getRetweetedStatus().getId();
+		String text = status.getText();
+		List<String> hashtagEntities = Arrays.stream(status.getHashtagEntities())
+				.map(hashtag -> "#" + hashtag).collect(Collectors.toList());
+
+		return new Tweet(id, createdAt, lat, lon, place, user, retweetId,
+				text, String.join(" ", hashtagEntities));
 	}
 
 	@Override
 	public String toString() {
-		return ToStringBuilder.reflectionToString(this,
-				ToStringStyle.MULTI_LINE_STYLE);
-	}
-
-	public static List<Tweet> convertStatusToTweets(List<Status> tweets) {
-		List<Tweet> result = new ArrayList<Tweet>();
-
-		for (Status tweet : tweets) {
-			long id = tweet.getId();
-			Date createdAt = tweet.getCreatedAt();
-
-			GeoLocation geoLocation = tweet.getGeoLocation();
-			double lat = 0.0;
-			double lng = 0.0;
-
-			if (geoLocation != null) {
-				lat = geoLocation.getLatitude();
-				lng = geoLocation.getLongitude();
-			}
-
-			List<String> hashtagEntities = new ArrayList<>();
-
-			for (HashtagEntity hashtag : tweet.getHashtagEntities()) {
-				hashtagEntities.add("#" + hashtag.getText());
-			}
-
-			String place = tweet.getPlace() == null ? null
-					: tweet.getPlace().getName();
-			String text = tweet.getText();
-			String user = tweet.getUser() == null ? null
-					: tweet.getUser().getScreenName();
-
-			long retweetId = tweet.getRetweetedStatus() == null ? -1
-					: tweet.getRetweetedStatus().getId();
-
-			Tweet t = new Tweet(id, createdAt, lat, lng, place, user, retweetId,
-					text, String.join(" ", hashtagEntities));
-			result.add(t);
-		}
-
-		return result;
-
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
 	}
 
 }

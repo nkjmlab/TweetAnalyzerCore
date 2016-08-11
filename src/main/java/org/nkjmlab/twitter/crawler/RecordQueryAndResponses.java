@@ -3,34 +3,34 @@ package org.nkjmlab.twitter.crawler;
 import java.util.List;
 
 import org.nkjmlab.twitter.model.Tweet;
-import org.nkjmlab.twitter.model.TweetDB;
+import org.nkjmlab.twitter.model.TweetsDatabase;
 
 import twitter4j.Query;
 import twitter4j.Status;
 
-public class RecordQueryAndResponse implements ProcedureForCollectedTweets {
+public class RecordQueryAndResponses implements ProcedureForCollectedTweets {
 	protected static org.apache.logging.log4j.Logger log = org.apache.logging.log4j.LogManager
 			.getLogger();
 	private String tableName;
-	private TweetDB tweetDB;
+	private TweetsDatabase tweetsDatabase;
 
 	/**
-	 *
-	 * @param tweetDB
+	 * Recording the query and the responses.
+	 * @param tweetsDatabase
 	 *            データを保存するデータベース
 	 * @param tableName
 	 *            データを保存するテーブル名
 	 */
-	public RecordQueryAndResponse(TweetDB tweetDB, String tableName) {
+	public RecordQueryAndResponses(TweetsDatabase tweetsDatabase, String tableName) {
 		this.tableName = tableName;
-		this.tweetDB = tweetDB;
-		tweetDB.createTweetTable(tableName);
+		this.tweetsDatabase = tweetsDatabase;
+		tweetsDatabase.createTweetTableIfNotExists(tableName);
 	}
 
 	@Override
 	public void apply(Query query, List<Status> rawTweets) {
 		List<Tweet> tweets = Tweet.convertStatusToTweets(rawTweets);
-		tweetDB.insertTweets(tableName, tweets);
+		tweetsDatabase.insertTweets(tableName, tweets);
 	}
 
 }

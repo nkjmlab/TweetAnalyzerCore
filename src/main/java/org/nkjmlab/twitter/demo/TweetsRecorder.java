@@ -1,13 +1,16 @@
 package org.nkjmlab.twitter.demo;
 
-import org.nkjmlab.twitter.crawler.RecordQueryAndResponse;
+import java.util.List;
+
 import org.nkjmlab.twitter.crawler.TweetsBackwardCrawler;
-import org.nkjmlab.twitter.crawler.TweetsBackwardCrawlerFactory;
-import org.nkjmlab.twitter.model.QueryFactory;
-import org.nkjmlab.twitter.model.TweetDB;
+import org.nkjmlab.twitter.model.Tweet;
+import org.nkjmlab.twitter.model.TweetsDatabase;
+import org.nkjmlab.twitter.util.QueryHelper;
+import org.nkjmlab.twitter.util.TwitterFactory;
 import org.nkjmlab.util.io.FileUtils;
 
 import twitter4j.Query;
+import twitter4j.Twitter;
 
 public class TweetsRecorder {
 
@@ -16,12 +19,18 @@ public class TweetsRecorder {
 
 	public static void main(String[] args) {
 
-		TweetsBackwardCrawler crawler = TweetsBackwardCrawlerFactory.create();
+		Twitter twitter = TwitterFactory.create("src/main/resources/twitter.conf");
+		TweetsBackwardCrawler crawler = new TweetsBackwardCrawler(twitter);
+		TweetsDatabase tweetsDatabase = new TweetsDatabase(
+				FileUtils.getFileInUserDirectory("tweets/tweetsDB"));
 
-		Query query = QueryFactory.create("人身事故");
+		Query query = QueryHelper.create("人身事故");
 
-		crawler.crawlTweets(query, new RecordQueryAndResponse(
-				new TweetDB(FileUtils.getTempFile("tweetsDB")), "TWEETS"));
+		crawler.crawl(query, (q, rawTweets) -> {
+			List<Tweet> tweets = Tweet.convertStatusToTweets(rawTweets);
+			tweetsDatabase.insertTweets("TWEETS", tweets);
+		});
+
 	}
 
 }

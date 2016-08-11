@@ -3,20 +3,20 @@ package org.nkjmlab.twitter.demo;
 import java.util.List;
 
 import org.nkjmlab.twitter.model.Tweet;
-import org.nkjmlab.twitter.model.TweetDB;
+import org.nkjmlab.twitter.model.TweetsDatabase;
 import org.nkjmlab.util.io.FileUtils;
 
-public class TweetsDBReader {
+public class TweetsDatabaseReader {
 
 	private static org.apache.logging.log4j.Logger log = org.apache.logging.log4j.LogManager
 			.getLogger();
 
 	public static void main(String[] args) {
 
-		TweetDB tweetDB = new TweetDB(FileUtils.getTempFile("tweetsDB"));
+		TweetsDatabase tweetsDatabase = new TweetsDatabase(
+				FileUtils.getFileInUserDirectory("tweets/tweetsDB"));
 
-		List<Tweet> tweets = tweetDB.readTweets("SELECT * FROM TWEETS LIMIT ?",
-				10);
+		List<Tweet> tweets = tweetsDatabase.readTweets("SELECT * FROM TWEETS LIMIT ?", 10);
 
 		for (Tweet tweet : tweets) {
 			String text = tweet.getUser();

@@ -1,11 +1,4 @@
-package org.nkjmlab.twitter.conn;
-
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-
-import net.arnx.jsonic.JSON;
-import net.arnx.jsonic.JSONException;
+package org.nkjmlab.twitter.conf;
 
 public class TwitterConfig {
 
@@ -56,18 +49,6 @@ public class TwitterConfig {
 
 	public void setConsumerSecret(String consumerSecret) {
 		this.consumerSecret = consumerSecret;
-	}
-
-	public static TwitterConfig create() {
-		try {
-			return JSON.decode(
-					new FileReader(new File(TwitterConfig.class.getClassLoader()
-							.getResource("twitter.conf").getPath())),
-					TwitterConfig.class);
-		} catch (JSONException | IOException e) {
-			e.printStackTrace();
-			return null;
-		}
 	}
 
 }

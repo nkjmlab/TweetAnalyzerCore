@@ -6,9 +6,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.nkjmlab.twitter.conn.TwitterConfig;
-import org.nkjmlab.twitter.conn.TwitterConnector;
-
 import twitter4j.Query;
 import twitter4j.QueryResult;
 import twitter4j.Status;
@@ -24,14 +21,8 @@ public class TweetsBackwardCrawler {
 	private ScheduledExecutorService executorService;
 	private ScheduledFuture<?> scheduledTasks;
 
-	public TweetsBackwardCrawler(TwitterConfig conf) {
-		this.twitter = TwitterConnector.create(conf);
-	}
-
-	public TweetsBackwardCrawler(String accessToken, String accessTokenSecret,
-			String consumerKey, String consumerSecret) {
-		this(new TwitterConfig(accessToken, accessTokenSecret, consumerKey,
-				consumerSecret));
+	public TweetsBackwardCrawler(Twitter twitter) {
+		this.twitter = twitter;
 	}
 
 	/**
@@ -40,15 +31,14 @@ public class TweetsBackwardCrawler {
 	 * @param action
 	 * @param query
 	 */
-	public void crawlTweets(Query query, ProcedureForCollectedTweets action) {
-
+	public void crawl(Query query, ProcedureForCollectedTweets action) {
 		this.executorService = Executors.newSingleThreadScheduledExecutor();
 		this.scheduledTasks = executorService.scheduleWithFixedDelay(
 				new TweetsSearchTask(query, action), 0, 5, TimeUnit.SECONDS);
 
 	}
 
-	class TweetsSearchTask implements Runnable {
+	private class TweetsSearchTask implements Runnable {
 		private ProcedureForCollectedTweets action;
 		private Query query;
 

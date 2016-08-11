@@ -4,3 +4,4 @@
 .classpath
 .project
 /src/main/resources/twitter.conf
+/src/main/java/twitter4j.properties

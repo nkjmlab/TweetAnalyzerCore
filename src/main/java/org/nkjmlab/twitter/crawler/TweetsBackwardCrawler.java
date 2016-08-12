@@ -29,7 +29,9 @@ public class TweetsBackwardCrawler {
 	 * queryのmaxIdを元にtweetsを遡って取得し，取得したツイートに対してActionを実行します．
 	 *
 	 * @param action
+	 *  the action to the query and recieved tweets.
 	 * @param query
+	 *  the query for crawl
 	 */
 	public void crawl(Query query, ProcedureForCollectedTweets action) {
 		this.executorService = Executors.newSingleThreadScheduledExecutor();
@@ -51,7 +53,7 @@ public class TweetsBackwardCrawler {
 		@Override
 		public void run() {
 			try {
-				log.debug("query is {}", query);
+				log.debug("query for search is {}", query);
 				QueryResult result = twitter.search(query);
 				List<Status> tweets = result.getTweets();
 				if (tweets.size() == 0) {

@@ -20,15 +20,17 @@ public class TweetsRecorder {
 	public static void main(String[] args) {
 
 		Twitter twitter = TwitterFactory.create("src/main/resources/twitter.conf");
-		TweetsBackwardCrawler crawler = new TweetsBackwardCrawler(twitter);
+		Query query = QueryHelper.create("人身事故");
+
 		TweetsDatabase tweetsDatabase = new TweetsDatabase(
 				FileUtils.getFileInUserDirectory("tweets/tweetsDB"));
 
-		Query query = QueryHelper.create("人身事故");
+		String tableName = "TWEETS";
 
-		crawler.crawl(query, (q, rawTweets) -> {
+		new TweetsBackwardCrawler(twitter).crawl(query, (q, rawTweets) -> {
+			tweetsDatabase.createTweetTableIfNotExists(tableName);
 			List<Tweet> tweets = Tweet.convertStatusToTweets(rawTweets);
-			tweetsDatabase.insertTweets("TWEETS", tweets);
+			tweetsDatabase.insertQueryAndTweets(q, tableName, tweets);
 		});
 
 	}

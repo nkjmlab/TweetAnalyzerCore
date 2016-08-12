@@ -18,7 +18,7 @@ public class Tweet {
 
 	private long id;
 
-	private Date createdAt;
+	private Date created;
 	private double lat;
 	private double lon;
 	private String place;
@@ -30,10 +30,10 @@ public class Tweet {
 	public Tweet() {
 	}
 
-	public Tweet(long id, Date createdAt, double lat, double lon, String place, String user,
+	public Tweet(long id, Date created, double lat, double lon, String place, String user,
 			long retweetId, String text, String hashtagEntities) {
 		this.id = id;
-		this.createdAt = createdAt;
+		this.created = created;
 		this.lat = lat;
 		this.lon = lon;
 		this.place = place;
@@ -44,9 +44,9 @@ public class Tweet {
 	}
 
 	public static String getRelationalSchema() {
-		return "(id long PRIMARY KEY," + "createdAt TIMESTAMP," + "lat DOUBLE,"
-				+ "lon DOUBLE," + "place VARCHAR," + "user VARCHAR," + "retweetId long, "
-				+ "text VARCHAR," + "hashtagEntities VARCHAR)";
+		return "(id long PRIMARY KEY," + "created TIMESTAMP," + "lat DOUBLE,"
+				+ "lon DOUBLE," + "place VARCHAR," + "user VARCHAR," + "retweet_id long, "
+				+ "text VARCHAR," + "hashtag_entities VARCHAR)";
 	}
 
 	public long getId() {
@@ -57,12 +57,12 @@ public class Tweet {
 		this.id = id;
 	}
 
-	public Date getCreatedAt() {
-		return createdAt;
+	public Date getCreated() {
+		return created;
 	}
 
-	public void setCreatedAt(Date createdAt) {
-		this.createdAt = createdAt;
+	public void setCreated(Date createdAt) {
+		this.created = createdAt;
 	}
 
 	public double getLat() {
@@ -127,7 +127,7 @@ public class Tweet {
 
 	public static Tweet convertStatusToTweet(Status status) {
 		long id = status.getId();
-		Date createdAt = status.getCreatedAt();
+		Date created = status.getCreatedAt();
 		GeoLocation geoLocation = status.getGeoLocation();
 		double lat = geoLocation == null ? 0.0 : geoLocation.getLatitude();
 		double lon = geoLocation == null ? 0.0 : geoLocation.getLongitude();
@@ -138,9 +138,9 @@ public class Tweet {
 				: status.getRetweetedStatus().getId();
 		String text = status.getText();
 		List<String> hashtagEntities = Arrays.stream(status.getHashtagEntities())
-				.map(hashtag -> "#" + hashtag).collect(Collectors.toList());
+				.map(hashtag -> "#" + hashtag.getText()).collect(Collectors.toList());
 
-		return new Tweet(id, createdAt, lat, lon, place, user, retweetId,
+		return new Tweet(id, created, lat, lon, place, user, retweetId,
 				text, String.join(" ", hashtagEntities));
 	}
 

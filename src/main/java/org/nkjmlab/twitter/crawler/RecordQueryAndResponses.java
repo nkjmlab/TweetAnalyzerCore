@@ -24,13 +24,12 @@ public class RecordQueryAndResponses implements ProcedureForCollectedTweets {
 	public RecordQueryAndResponses(TweetsDatabase tweetsDatabase, String tableName) {
 		this.tableName = tableName;
 		this.tweetsDatabase = tweetsDatabase;
-		tweetsDatabase.createTweetTableIfNotExists(tableName);
 	}
 
 	@Override
 	public void apply(Query query, List<Status> rawTweets) {
 		List<Tweet> tweets = Tweet.convertStatusToTweets(rawTweets);
-		tweetsDatabase.insertTweets(tableName, tweets);
+		tweetsDatabase.insertQueryAndTweets(query, tableName, tweets);
 	}
 
 }

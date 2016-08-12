@@ -27,15 +27,11 @@
 		</Console>
 	</Appenders>
 	<Loggers>
-		<Root level="debug">
+		<Root level="DEBUG">
 			<AppenderRef ref="stdout" />
 			<AppenderRef ref="stderr" />
 		</Root>
-		<Logger name="org.magcruise" level="trace" additivity="false">
-			<AppenderRef ref="stdout" />
-			<AppenderRef ref="stderr" />
-		</Logger>
-		<Logger name="org.nkjmlab" level="trace" additivity="false">
+		<Logger name="org.nkjmlab" level="DEBUG" additivity="false">
 			<AppenderRef ref="stdout" />
 			<AppenderRef ref="stderr" />
 		</Logger>

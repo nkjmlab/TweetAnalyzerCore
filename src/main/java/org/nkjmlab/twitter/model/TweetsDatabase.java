@@ -17,7 +17,7 @@ import twitter4j.Query;
 
 public class TweetsDatabase {
 	protected static Logger log = LogManager.getLogger();
-	protected H2ClientWithConnectionPool dbClient;
+	protected H2ClientWithConnectionPool client;
 
 	static {
 		H2Server.start();
@@ -38,8 +38,8 @@ public class TweetsDatabase {
 	 *  the conf to access database.
 	 */
 	public TweetsDatabase(DbConfig conf) {
-		this.dbClient = DbClientFactory.createH2ClientWithConnectionPool(conf);
-		dbClient.createTableIfNotExists(QueryLog.getTableSchema());
+		this.client = DbClientFactory.createH2ClientWithConnectionPool(conf);
+		client.createTableIfNotExists(QueryLog.getTableSchema());
 	}
 
 	/**
@@ -47,29 +47,29 @@ public class TweetsDatabase {
 	 * @param tableName
 	 */
 	public void createTweetTableIfNotExists(String tableName) {
-		dbClient.createTableIfNotExists(tableName + Tweet.getRelationalSchema());
-		dbClient.createIndexIfNotExists(tableName + "_created", tableName, "created");
-		dbClient.createIndexIfNotExists(tableName + "_user", tableName, "user");
+		client.createTableIfNotExists(tableName + Tweet.getRelationalSchema());
+		client.createIndexIfNotExists(tableName + "_created", tableName, "created");
+		client.createIndexIfNotExists(tableName + "_user", tableName, "user");
 	}
 
 	public void dropTableIfExists(String tableName) {
-		dbClient.dropTableIfExists(tableName);
+		client.dropTableIfExists(tableName);
 	}
 
 	/**
 	 * Deligating {@link DbClient#read(Class, String, Object...)}.
 	 */
 	public List<Tweet> readTweets(String sql, Object... objs) {
-		return dbClient.readList(Tweet.class, sql, objs);
+		return client.readList(Tweet.class, sql, objs);
 	}
 
 	public void insertTweet(String table, Tweet tweet) {
-		if (dbClient.read(Tweet.class, "SELECT * FROM " + table + " WHERE ID=?",
+		if (client.read(Tweet.class, "SELECT * FROM " + table + " WHERE ID=?",
 				tweet.getId()) != null) {
 			return;
 		}
 		String sql = "INSERT INTO " + table + " VALUES (?,?,?,?,?,?,?,?,?)";
-		dbClient.executeUpdate(sql, tweet.getId(), tweet.getCreated(), tweet.getLat(),
+		client.executeUpdate(sql, tweet.getId(), tweet.getCreated(), tweet.getLat(),
 				tweet.getLon(), tweet.getPlace(), tweet.getUser(), tweet.getRetweetId(),
 				tweet.getText(), tweet.getHashtagEntities());
 	}
@@ -101,24 +101,24 @@ public class TweetsDatabase {
 	}
 
 	private void insertQuery(Query query, String tableName, List<Long> tweetIds) {
-		tweetIds.forEach(tweetId -> dbClient.insert(new QueryLog(query, tableName, tweetId)));
+		tweetIds.forEach(tweetId -> client.insert(new QueryLog(query, tableName, tweetId)));
 	}
 
-	public H2ClientWithConnectionPool getDbClient() {
-		return dbClient;
+	public H2ClientWithConnectionPool getClient() {
+		return client;
 	}
 
 	/**
 	 * Closing db connection.
 	 */
 	public void close() {
-		dbClient.dispose();
+		client.dispose();
 	}
 
 	@Override
 	protected void finalize() throws Throwable {
 		super.finalize();
-		dbClient.dispose();
+		client.dispose();
 	}
 
 }

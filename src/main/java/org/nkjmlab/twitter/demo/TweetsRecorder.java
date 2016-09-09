@@ -1,9 +1,5 @@
 package org.nkjmlab.twitter.demo;
 
-import java.util.List;
-
-import org.nkjmlab.twitter.crawler.TweetsBackwardCrawler;
-import org.nkjmlab.twitter.model.Tweet;
 import org.nkjmlab.twitter.model.TweetsDatabase;
 import org.nkjmlab.twitter.util.QueryHelper;
 import org.nkjmlab.twitter.util.TwitterFactory;
@@ -19,19 +15,15 @@ public class TweetsRecorder {
 
 	public static void main(String[] args) {
 
-		Twitter twitter = TwitterFactory.create("src/main/resources/twitter.conf");
+		Twitter twitter = TwitterFactory.getSingleton();
 		Query query = QueryHelper.create("人身事故");
 
 		TweetsDatabase tweetsDatabase = new TweetsDatabase(
-				FileUtils.getFileInUserDirectory("tweets/tweetsDB"));
+				FileUtils.getFileInUserDirectory("h2/tweets"));
 
 		String tableName = "TWEETS";
 
-		new TweetsBackwardCrawler(twitter).crawl(query, (q, rawTweets) -> {
-			tweetsDatabase.createTweetTableIfNotExists(tableName);
-			List<Tweet> tweets = Tweet.convertStatusToTweets(rawTweets);
-			tweetsDatabase.insertQueryAndTweets(q, tableName, tweets);
-		});
+		tweetsDatabase.crawl(tableName, query, twitter);
 
 	}
 

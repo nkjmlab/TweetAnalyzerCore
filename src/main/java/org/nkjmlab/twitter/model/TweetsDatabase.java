@@ -4,24 +4,16 @@ import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.nkjmlab.twitter.crawler.TweetsBackwardCrawler;
+import org.nkjmlab.util.db.Database;
 import org.nkjmlab.util.db.DbClient;
-import org.nkjmlab.util.db.DbClientFactory;
 import org.nkjmlab.util.db.DbConfig;
-import org.nkjmlab.util.db.H2ClientWithConnectionPool;
 import org.nkjmlab.util.db.H2ConfigFactory;
-import org.nkjmlab.util.db.H2Server;
 
 import twitter4j.Query;
+import twitter4j.Twitter;
 
-public class TweetsDatabase {
-	protected static Logger log = LogManager.getLogger();
-	protected H2ClientWithConnectionPool client;
-
-	static {
-		H2Server.start();
-	}
+public class TweetsDatabase extends Database {
 
 	/**
 	 * Tweets database object related with dbFile.
@@ -38,8 +30,8 @@ public class TweetsDatabase {
 	 *  the conf to access database.
 	 */
 	public TweetsDatabase(DbConfig conf) {
-		this.client = DbClientFactory.createH2ClientWithConnectionPool(conf);
-		client.createTableIfNotExists(QueryLog.getTableSchema());
+		super(conf);
+		createTableIfNotExists(QueryLog.getSchema());
 	}
 
 	/**
@@ -47,29 +39,29 @@ public class TweetsDatabase {
 	 * @param tableName
 	 */
 	public void createTweetTableIfNotExists(String tableName) {
-		client.createTableIfNotExists(tableName + Tweet.getRelationalSchema());
-		client.createIndexIfNotExists(tableName + "_created", tableName, "created");
-		client.createIndexIfNotExists(tableName + "_user", tableName, "user");
+		createTableIfNotExists(Tweet.getSchema(tableName));
+		createIndexIfNotExists(tableName + "_created", tableName, "created");
+		createIndexIfNotExists(tableName + "_user", tableName, "user");
 	}
 
 	public void dropTableIfExists(String tableName) {
-		client.dropTableIfExists(tableName);
+		dropTableIfExists(tableName);
 	}
 
 	/**
 	 * Deligating {@link DbClient#read(Class, String, Object...)}.
 	 */
 	public List<Tweet> readTweets(String sql, Object... objs) {
-		return client.readList(Tweet.class, sql, objs);
+		return readList(Tweet.class, sql, objs);
 	}
 
-	public void insertTweet(String table, Tweet tweet) {
-		if (client.read(Tweet.class, "SELECT * FROM " + table + " WHERE ID=?",
+	public void insertTweet(String tableName, Tweet tweet) {
+		if (read(Tweet.class, "SELECT * FROM " + tableName + " WHERE ID=?",
 				tweet.getId()) != null) {
 			return;
 		}
-		String sql = "INSERT INTO " + table + " VALUES (?,?,?,?,?,?,?,?,?)";
-		client.executeUpdate(sql, tweet.getId(), tweet.getCreated(), tweet.getLat(),
+		String sql = "INSERT INTO " + tableName + " VALUES (?,?,?,?,?,?,?,?,?)";
+		executeUpdate(sql, tweet.getId(), tweet.getCreated(), tweet.getLat(),
 				tweet.getLon(), tweet.getPlace(), tweet.getUser(), tweet.getRetweetId(),
 				tweet.getText(), tweet.getHashtagEntities());
 	}
@@ -101,24 +93,15 @@ public class TweetsDatabase {
 	}
 
 	private void insertQuery(Query query, String tableName, List<Long> tweetIds) {
-		tweetIds.forEach(tweetId -> client.insert(new QueryLog(query, tableName, tweetId)));
+		tweetIds.forEach(tweetId -> insert(new QueryLog(query, tableName, tweetId)));
 	}
 
-	public H2ClientWithConnectionPool getClient() {
-		return client;
-	}
-
-	/**
-	 * Closing db connection.
-	 */
-	public void close() {
-		client.dispose();
-	}
-
-	@Override
-	protected void finalize() throws Throwable {
-		super.finalize();
-		client.dispose();
+	public void crawl(String tableName, Query query, Twitter twitter) {
+		new TweetsBackwardCrawler(twitter).crawl(query, (q, rawTweets) -> {
+			createTweetTableIfNotExists(tableName);
+			List<Tweet> tweets = Tweet.convertStatusToTweets(rawTweets);
+			insertQueryAndTweets(q, tableName, tweets);
+		});
 	}
 
 }

@@ -54,4 +54,8 @@ public class TwitterFactory {
 			throw new RuntimeException(e);
 		}
 	}
+
+	public static Twitter getSingleton() {
+		return twitter4j.TwitterFactory.getSingleton();
+	}
 }

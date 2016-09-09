@@ -43,9 +43,9 @@ public class Tweet {
 		this.hashtagEntities = hashtagEntities;
 	}
 
-	public static String getRelationalSchema() {
-		return "(id long PRIMARY KEY," + "created TIMESTAMP," + "lat DOUBLE,"
-				+ "lon DOUBLE," + "place VARCHAR," + "user VARCHAR," + "retweet_id long, "
+	public static String getSchema(String tableName) {
+		return tableName + "(id BIGINT PRIMARY KEY," + "created TIMESTAMP," + "lat DOUBLE,"
+				+ "lon DOUBLE," + "place VARCHAR," + "user VARCHAR," + "retweet_id BIGINT, "
 				+ "text VARCHAR," + "hashtag_entities VARCHAR)";
 	}
 
@@ -61,8 +61,8 @@ public class Tweet {
 		return created;
 	}
 
-	public void setCreated(Date createdAt) {
-		this.created = createdAt;
+	public void setCreated(Date created) {
+		this.created = created;
 	}
 
 	public double getLat() {

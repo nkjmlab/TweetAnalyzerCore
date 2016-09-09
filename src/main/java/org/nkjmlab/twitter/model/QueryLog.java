@@ -33,7 +33,7 @@ public class QueryLog {
 		this.until = query.getUntil();
 	}
 
-	public static String getTableSchema() {
+	public static String getSchema() {
 		return TABLE_NAME + "(id bigint primary key auto_increment, "
 				+ "created TIMESTAMP AS CURRENT_TIMESTAMP NOT NULL, " + "table_name varchar, "
 				+ "tweet_id bigint,"

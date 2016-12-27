@@ -17,11 +17,11 @@ public class TweetsDatabase extends Database {
 
 	/**
 	 * Tweets database object related with dbFile.
-	 * @param dbFile
+	 * @param jdbcUrlPath
 	 *  the file accumulating tweets.
 	 */
-	public TweetsDatabase(File dbFile) {
-		this(H2ConfigFactory.create(dbFile));
+	public TweetsDatabase(File jdbcUrlPath) {
+		this(H2ConfigFactory.create(jdbcUrlPath));
 	}
 
 	/**
@@ -40,7 +40,7 @@ public class TweetsDatabase extends Database {
 	 */
 	public void createTweetTableIfNotExists(String tableName) {
 		createTableIfNotExists(Tweet.getSchema(tableName));
-		createIndexIfNotExists(tableName + "_created", tableName, "created");
+		createIndexIfNotExists(tableName + "_createdAt", tableName, "created_at");
 		createIndexIfNotExists(tableName + "_user", tableName, "user");
 	}
 
@@ -61,7 +61,7 @@ public class TweetsDatabase extends Database {
 			return;
 		}
 		String sql = "INSERT INTO " + tableName + " VALUES (?,?,?,?,?,?,?,?,?)";
-		executeUpdate(sql, tweet.getId(), tweet.getCreated(), tweet.getLat(),
+		executeUpdate(sql, tweet.getId(), tweet.getCreatedAt(), tweet.getLat(),
 				tweet.getLon(), tweet.getPlace(), tweet.getUser(), tweet.getRetweetId(),
 				tweet.getText(), tweet.getHashtagEntities());
 	}

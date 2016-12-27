@@ -18,7 +18,7 @@ public class Tweet {
 
 	private long id;
 
-	private Date created;
+	private Date createdAt;
 	private double lat;
 	private double lon;
 	private String place;
@@ -33,7 +33,7 @@ public class Tweet {
 	public Tweet(long id, Date created, double lat, double lon, String place, String user,
 			long retweetId, String text, String hashtagEntities) {
 		this.id = id;
-		this.created = created;
+		this.createdAt = created;
 		this.lat = lat;
 		this.lon = lon;
 		this.place = place;
@@ -44,7 +44,7 @@ public class Tweet {
 	}
 
 	public static String getSchema(String tableName) {
-		return tableName + "(id BIGINT PRIMARY KEY," + "created TIMESTAMP," + "lat DOUBLE,"
+		return tableName + "(id BIGINT PRIMARY KEY," + "created_at TIMESTAMP," + "lat DOUBLE,"
 				+ "lon DOUBLE," + "place VARCHAR," + "user VARCHAR," + "retweet_id BIGINT, "
 				+ "text VARCHAR," + "hashtag_entities VARCHAR)";
 	}
@@ -57,12 +57,12 @@ public class Tweet {
 		this.id = id;
 	}
 
-	public Date getCreated() {
-		return created;
+	public Date getCreatedAt() {
+		return createdAt;
 	}
 
-	public void setCreated(Date created) {
-		this.created = created;
+	public void setCreatedAt(Date created) {
+		this.createdAt = created;
 	}
 
 	public double getLat() {

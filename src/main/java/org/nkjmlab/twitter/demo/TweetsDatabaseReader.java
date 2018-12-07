@@ -14,7 +14,7 @@ public class TweetsDatabaseReader {
 	public static void main(String[] args) {
 
 		TweetsDatabase tweetsDatabase = new TweetsDatabase(
-				FileUtils.getFileInUserDirectory("h2/tweets"));
+				FileUtils.getFileInUserDirectory("h2-db/tweets"));
 
 		List<Tweet> tweets = tweetsDatabase.readTweets("SELECT * FROM TWEETS LIMIT ?", 10);
 

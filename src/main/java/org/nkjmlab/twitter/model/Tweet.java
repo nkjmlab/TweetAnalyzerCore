@@ -1,13 +1,14 @@
 package org.nkjmlab.twitter.model;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.nkjmlab.util.time.DateTimeUtils;
 
 import net.sf.persist.annotations.NoTable;
 import twitter4j.GeoLocation;
@@ -18,7 +19,7 @@ public class Tweet {
 
 	private long id;
 
-	private Date createdAt;
+	private LocalDateTime createdAt;
 	private double lat;
 	private double lon;
 	private String place;
@@ -30,7 +31,7 @@ public class Tweet {
 	public Tweet() {
 	}
 
-	public Tweet(long id, Date created, double lat, double lon, String place, String user,
+	public Tweet(long id, LocalDateTime created, double lat, double lon, String place, String user,
 			long retweetId, String text, String hashtagEntities) {
 		this.id = id;
 		this.createdAt = created;
@@ -57,11 +58,11 @@ public class Tweet {
 		this.id = id;
 	}
 
-	public Date getCreatedAt() {
+	public LocalDateTime getCreatedAt() {
 		return createdAt;
 	}
 
-	public void setCreatedAt(Date created) {
+	public void setCreatedAt(LocalDateTime created) {
 		this.createdAt = created;
 	}
 
@@ -127,7 +128,7 @@ public class Tweet {
 
 	public static Tweet convertStatusToTweet(Status status) {
 		long id = status.getId();
-		Date created = status.getCreatedAt();
+		LocalDateTime created = DateTimeUtils.toLocalDateTime(status.getCreatedAt());
 		GeoLocation geoLocation = status.getGeoLocation();
 		double lat = geoLocation == null ? 0.0 : geoLocation.getLatitude();
 		double lon = geoLocation == null ? 0.0 : geoLocation.getLongitude();

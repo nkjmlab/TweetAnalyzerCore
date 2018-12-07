@@ -19,7 +19,7 @@ public class TweetsRecorder {
 		Query query = QueryHelper.create("人身事故");
 
 		TweetsDatabase tweetsDatabase = new TweetsDatabase(
-				FileUtils.getFileInUserDirectory("h2/tweets"));
+				FileUtils.getFileInUserDirectory("h2-db/tweets"));
 
 		String tableName = "TWEETS";
 

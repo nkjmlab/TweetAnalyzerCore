@@ -25,6 +25,16 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.nkjmlab</groupId>
+			<artifactId>nkjmlab-utils-json</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.nkjmlab</groupId>
+			<artifactId>nkjmlab-utils-h2</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.nkjmlab</groupId>
 			<artifactId>nkjmlab-utils</artifactId>
 		</dependency>
 		<dependency>

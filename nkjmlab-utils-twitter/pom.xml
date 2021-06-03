@@ -1,0 +1,63 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>nkjmlab-utils-twitter</artifactId>
+  <parent>
+    <groupId>org.nkjmlab</groupId>
+    <artifactId>nkjmlab-utils-twitter-parent</artifactId>
+    <version>0.0.4</version>
+  </parent>
+
+  <properties>
+    <jackson-version>2.12.3</jackson-version>
+    <junit-version>5.7.1</junit-version>
+    <slf4j-version>1.7.30</slf4j-version>
+    <h2-version>1.4.200</h2-version>
+  </properties>
+  <dependencies>
+    <!-- https://mvnrepository.com/artifact/org.twitter4j/twitter4j-core -->
+    <dependency>
+      <groupId>org.twitter4j</groupId>
+      <artifactId>twitter4j-core</artifactId>
+      <version>[4.0,)</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>${log4j-version}</version>
+    </dependency>
+
+
+    <!-- https://mvnrepository.com/artifact/org.nkjmlab/sorm4j -->
+    <dependency>
+      <groupId>org.nkjmlab</groupId>
+      <artifactId>sorm4j</artifactId>
+      <version>[1,)</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>${h2-version}</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.0</version>
+        <configuration>
+          <compilerVersion>11</compilerVersion>
+          <source>11</source>
+          <target>11</target>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

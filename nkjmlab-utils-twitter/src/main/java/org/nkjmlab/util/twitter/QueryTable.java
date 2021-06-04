@@ -1,4 +1,4 @@
-package org.nkjmlab.twitter;
+package org.nkjmlab.util.twitter;
 
 import static org.nkjmlab.sorm4j.sql.schema.TableSchemaKeyword.*;
 import java.util.List;
@@ -33,7 +33,7 @@ public class QueryTable {
   }
 
   public void insertQuery(twitter4j.Query query, List<Long> tweetIds) {
-    orm.insert(new org.nkjmlab.twitter.Query(query, tweetIds));
+    orm.insert(new org.nkjmlab.util.twitter.Query(query, tweetIds));
   }
 
 

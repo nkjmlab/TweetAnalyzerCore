@@ -1,4 +1,4 @@
-package org.nkjmlab.twitter;
+package org.nkjmlab.util.twitter;
 
 public class TwitterConfig {
 

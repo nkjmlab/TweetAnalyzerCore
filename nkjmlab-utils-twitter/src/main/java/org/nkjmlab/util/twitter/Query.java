@@ -1,4 +1,4 @@
-package org.nkjmlab.twitter;
+package org.nkjmlab.util.twitter;
 
 import java.util.Date;
 import java.util.List;

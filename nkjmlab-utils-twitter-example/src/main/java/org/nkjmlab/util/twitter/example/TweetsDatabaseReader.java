@@ -1,12 +1,12 @@
-package org.nkjmlab.twitter.example;
+package org.nkjmlab.util.twitter.example;
 
 import java.util.List;
 import javax.sql.DataSource;
 import org.h2.jdbcx.JdbcConnectionPool;
-import org.nkjmlab.twitter.Tweet;
-import org.nkjmlab.twitter.TweetTable;
 import org.nkjmlab.util.db.FileDatabaseConfig;
 import org.nkjmlab.util.db.H2Server;
+import org.nkjmlab.util.twitter.Tweet;
+import org.nkjmlab.util.twitter.TweetTable;
 
 public class TweetsDatabaseReader {
   private static org.apache.logging.log4j.Logger log =

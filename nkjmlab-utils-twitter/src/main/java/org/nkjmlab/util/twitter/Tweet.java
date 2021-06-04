@@ -1,4 +1,4 @@
-package org.nkjmlab.twitter;
+package org.nkjmlab.util.twitter;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;

@@ -1,4 +1,4 @@
-package org.nkjmlab.twitter;
+package org.nkjmlab.util.twitter;
 
 import static org.nkjmlab.sorm4j.sql.schema.TableSchemaKeyword.*;
 import java.util.List;

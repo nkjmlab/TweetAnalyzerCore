@@ -1,11 +1,11 @@
-package org.nkjmlab.twitter.example;
+package org.nkjmlab.util.twitter.example;
 
 import javax.sql.DataSource;
 import org.h2.jdbcx.JdbcConnectionPool;
-import org.nkjmlab.twitter.TwitterCrawler;
-import org.nkjmlab.twitter.util.TwitterFactory;
 import org.nkjmlab.util.db.FileDatabaseConfig;
 import org.nkjmlab.util.db.H2Server;
+import org.nkjmlab.util.twitter.TwitterCrawler;
+import org.nkjmlab.util.twitter.TwitterFactory;
 import twitter4j.GeoLocation;
 import twitter4j.Query;
 import twitter4j.Twitter;

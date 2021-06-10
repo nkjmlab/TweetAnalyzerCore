@@ -12,16 +12,16 @@ public class TweetTable {
   private final TableSchema schema;
   private final Orm orm;
 
-  private static final String ID = "ID";
-  private static final String CREATED_AT = "created_at";
-  private static final String LAT = "lat";
-  private static final String LON = "lon";
-  private static final String PLACE = "place";
-  private static final String USER = "user";
-  private static final String RETWEET_ID = "retweet_id";
-  private static final String TEXT = "text";
-  private static final String HASHTAG_ENTITIES = "HASHTAG_ENTITIES";
-  private static final String FAVORITE_COUNT = "favorite_count";
+  public static final String ID = "id";
+  public static final String CREATED_AT = "created_at";
+  public static final String LAT = "lat";
+  public static final String LON = "lon";
+  public static final String PLACE = "place";
+  public static final String USER = "user";
+  public static final String RETWEET_ID = "retweet_id";
+  public static final String TEXT = "text";
+  public static final String HASHTAG_ENTITIES = "hashtag_entities";
+  public static final String FAVORITE_COUNT = "favorite_count";
 
   /**
    *
@@ -43,8 +43,8 @@ public class TweetTable {
 
 
 
-  public List<Tweet> readTweets(String sql, Object... objs) {
-    return orm.readList(Tweet.class, sql, objs);
+  public List<Tweet> readTweets(String sql, Object... parameters) {
+    return orm.readList(Tweet.class, sql, parameters);
   }
 
   public void mergeTweet(Tweet tweet) {

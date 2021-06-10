@@ -1,17 +1,14 @@
-package org.nkjmlab.util.twitter.example;
+package org.nkjmlab.util.twitter;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.nkjmlab.util.lang.Try;
-import org.nkjmlab.util.twitter.TwitterFactory;
 import twitter4j.IDs;
 import twitter4j.Paging;
 import twitter4j.ResponseList;
@@ -21,21 +18,13 @@ import twitter4j.api.TimelinesResources;
 
 public class TimeLineReader {
   private static Logger log = LogManager.getLogger();
+  private Twitter twitter;
 
-  public static void main(String[] args) {
-    Twitter twitter = TwitterFactory.create();
-
-    List<Long> result = getFollowers(twitter, "IPSJ_official").stream().filter(uid -> {
-      log.debug("uid=" + uid);
-      Optional<Status> op =
-          getTimeLine(twitter, uid).stream().filter(s -> s.getText().contains("COVID")).findAny();
-      return op.isPresent();
-    }).collect(Collectors.toList());
-
-    result.forEach(uid -> System.out.println(uid + "\t" + getFollowers(twitter, uid)));
+  public TimeLineReader(Twitter twitter) {
+    this.twitter = twitter;
   }
 
-  private static List<Status> getTimeLine(Twitter twitter, long userId) {
+  public List<Status> getTimeLine(long userId) {
     return Try.getWithCatch(() -> {
       TimelinesResources timeline = twitter.timelines();
 
@@ -52,17 +41,17 @@ public class TimeLineReader {
 
   }
 
-  private static Set<Long> getFollowers(Twitter twitter, long userId) {
-    return getFollowersAux(twitter, Try
+  public Set<Long> getFollowers(long userId) {
+    return getFollowersAux(Try
         .createFunctionWithThrow(cursor -> twitter.getFollowersIDs(userId, cursor), Try::rethrow));
   }
 
-  private static Set<Long> getFollowers(Twitter twitter, String screenName) {
-    return getFollowersAux(twitter, Try.createFunctionWithThrow(
+  public Set<Long> getFollowers(String screenName) {
+    return getFollowersAux(Try.createFunctionWithThrow(
         cursor -> twitter.getFollowersIDs(screenName, cursor), Try::rethrow));
   }
 
-  private static Set<Long> getFollowersAux(Twitter twitter, Function<Long, IDs> idFunc) {
+  private Set<Long> getFollowersAux(Function<Long, IDs> idFunc) {
     return Try.getWithCatch(() -> {
       Set<Long> followerIDs = new HashSet<>();
       IDs ids = null;

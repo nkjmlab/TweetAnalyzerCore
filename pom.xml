@@ -97,7 +97,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.0</version>
+        <version>3.8.1</version>
         <configuration>
           <compilerVersion>11</compilerVersion>
           <source>11</source>
@@ -132,9 +132,8 @@
         <version>1.6.7</version>
         <extensions>true</extensions>
         <configuration>
-          <serverId>ossrh</serverId>
-          <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-          <autoReleaseAfterClose>false</autoReleaseAfterClose>
+          <serverId>nkjmlab-maven-releases</serverId>
+          <nexusUrl>https://maven.nkjmlab.org/repository/maven-releases/</nexusUrl>
         </configuration>
       </plugin>
       <!-- ********** for Deployment to remote mvn server END ******* -->

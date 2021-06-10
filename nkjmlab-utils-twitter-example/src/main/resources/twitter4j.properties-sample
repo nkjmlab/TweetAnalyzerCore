@@ -1,5 +1,5 @@
 # Rename to twitter4j.properties and set consumerKey, consumerSecret, accessToken and accessTokenSecret.
-# see http://twitter4j.org/ja/configuration.html
+# see https://twitter4j.org/ja/configuration.html
 
 oauth.consumerKey=***********************
 oauth.consumerSecret=***********************

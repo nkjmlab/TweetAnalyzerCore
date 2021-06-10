@@ -4,27 +4,26 @@ import javax.sql.DataSource;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.nkjmlab.util.db.FileDatabaseConfig;
 import org.nkjmlab.util.db.H2Server;
-import org.nkjmlab.util.twitter.TwitterCrawler;
+import org.nkjmlab.util.twitter.TweetRecorder;
 import org.nkjmlab.util.twitter.TwitterFactory;
 import twitter4j.GeoLocation;
 import twitter4j.Query;
 import twitter4j.Twitter;
 
-public class TweetsRecorder {
+public class TweetsRecorderExample {
 
   public static void main(String[] args) {
-    Twitter twitter = TwitterFactory.create();
-    H2Server.startAndWait();
 
+    H2Server.startAndWait();
+    Twitter twitter = TwitterFactory.create();
     FileDatabaseConfig config = new FileDatabaseConfig.Builder("~/db/", "tweet-db", "", "").build();
     DataSource db =
         JdbcConnectionPool.create(config.getJdbcUrl(), config.getUsername(), config.getPassword());
-
     String tableName = "tweets";
+
+
     Query query = createQuery("東京オリンピック");
-
-    new TwitterCrawler(twitter).crawl(db, tableName, query);
-
+    new TweetRecorder(twitter, db, tableName).fetchAndRecord(query);
   }
 
   /**
@@ -34,7 +33,7 @@ public class TweetsRecorder {
    * @param maxId
    * @return
    */
-  private static Query createQuery(String searchWord) {
+  public static Query createQuery(String searchWord) {
     return createQuery(searchWord, Long.MAX_VALUE);
   }
 
@@ -45,7 +44,7 @@ public class TweetsRecorder {
    * @param maxId
    * @return
    */
-  private static Query createQuery(String searchWord, long maxId) {
+  public static Query createQuery(String searchWord, long maxId) {
     Query query = new Query(searchWord);
     query.setCount(100);
     query.setMaxId(maxId);
@@ -62,10 +61,11 @@ public class TweetsRecorder {
    * @param maxId
    * @return
    */
-  private static Query createQuery(String searchWord, double lat, double lon, double radius,
+  public static Query createQuery(String searchWord, double lat, double lon, double radius,
       long maxId) {
     Query query = createQuery(searchWord, maxId);
     query.setGeoCode(new GeoLocation(lat, lon), radius, Query.KILOMETERS);
     return query;
   }
+
 }

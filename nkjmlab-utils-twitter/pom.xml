@@ -44,5 +44,4 @@
       <version>${h2-version}</version>
     </dependency>
   </dependencies>
-  </build>
 </project>

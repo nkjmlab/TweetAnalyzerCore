@@ -17,8 +17,7 @@ public class TweetTableReaderExample {
   public static void main(String[] args) {
     H2Server.startAndWait();
 
-    FileDatabaseConfig config =
-        new FileDatabaseConfig.Builder("~/db/", "tweet-db", "username", "password").build();
+    FileDatabaseConfig config = new FileDatabaseConfig.Builder("~/h2db/", "tweet-db").build();
     log.debug("File database config is [{}]", config);
     DataSource db =
         JdbcConnectionPool.create(config.getJdbcUrl(), config.getUsername(), config.getPassword());

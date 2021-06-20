@@ -4,30 +4,23 @@ import java.io.File;
 
 public class FileDatabaseConfig {
 
-  private final String dbDir;
+  private final File dbDir;
   private final String dbName;
   private final String username;
   private final String password;
   private final String jdbcUrl;
-  private final File dbDirFile;
 
 
-  private FileDatabaseConfig(String dbDir, String dbName, String username, String password) {
+  private FileDatabaseConfig(File dbDir, String dbName, String username, String password) {
     this.dbDir = dbDir;
     this.dbName = dbName;
     this.username = username;
     this.password = password;
-    this.jdbcUrl = "jdbc:h2:tcp://localhost/" + getDbDir() + dbName;
-    this.dbDirFile = dbDir.startsWith("~/")
-        ? new File(dbDir.replace("~/",
-            new File(System.getProperty("user.home")).getPath() + File.separator))
-        : new File(dbDir);
-
-
+    this.jdbcUrl = "jdbc:h2:tcp://localhost/" + new File(dbDir, dbName);
   }
 
 
-  public String getDbDir() {
+  public File getDbDir() {
     return dbDir;
   }
 
@@ -50,18 +43,33 @@ public class FileDatabaseConfig {
 
 
   public static class Builder {
-    private String dbDir = "~/db/";
+    private String dbDir;
     private String dbName;
     private String username = "";
     private String password = "";
 
-    public Builder() {}
+    public Builder() {
+      setDbDir("~/db/");
+    }
 
+    /**
+     * Initializes a newly created {@code FileDatabaseConfig.Builder} object; you can get
+     * {{@code FileDatabaseConfig} object via {@link #build()} method.
+     *
+     * @param dbDir the directory including the database file.
+     * @param dbName the name of database.
+     * @param username
+     * @param password
+     */
     public Builder(String dbDir, String dbName, String username, String password) {
-      this.dbDir = dbDir;
       this.dbName = dbName;
       this.username = username;
       this.password = password;
+      setDbDir(dbDir);
+    }
+
+    public Builder(String dbDir, String dbName) {
+      this(dbDir, dbName, "", "");
     }
 
     public Builder setUsername(String username) {
@@ -75,6 +83,10 @@ public class FileDatabaseConfig {
     }
 
     public Builder setDbDir(String dbDir) {
+      if (dbDir.startsWith("~/")) {
+        dbDir = dbDir.replace("~/",
+            new File(System.getProperty("user.home")).getPath() + File.separator);
+      }
       this.dbDir = dbDir;
       return this;
     }
@@ -85,21 +97,16 @@ public class FileDatabaseConfig {
     }
 
     public FileDatabaseConfig build() {
-      return new FileDatabaseConfig(dbDir, dbName, username, password);
+      return new FileDatabaseConfig(new File(dbDir), dbName, username, password);
     }
   }
 
 
 
-  private File getDbDirFile() {
-    return dbDirFile;
-  }
-
-
   @Override
   public String toString() {
     return "FileDatabaseConfig [dbDir=" + dbDir + ", dbName=" + dbName + ", username=" + username
-        + ", password=" + password + ", jdbcUrl=" + jdbcUrl + ", dbDirFile=" + dbDirFile + "]";
+        + ", password=" + password + ", jdbcUrl=" + jdbcUrl + "]";
   }
 
 

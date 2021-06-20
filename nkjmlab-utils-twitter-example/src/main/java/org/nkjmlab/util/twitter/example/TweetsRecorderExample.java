@@ -11,18 +11,20 @@ import twitter4j.Query;
 import twitter4j.Twitter;
 
 public class TweetsRecorderExample {
+  private static org.apache.logging.log4j.Logger log =
+      org.apache.logging.log4j.LogManager.getLogger();
 
   public static void main(String[] args) {
 
     H2Server.startAndWait();
     Twitter twitter = TwitterFactory.create();
-    FileDatabaseConfig config = new FileDatabaseConfig.Builder("~/db/", "tweet-db", "", "").build();
+    FileDatabaseConfig config = new FileDatabaseConfig.Builder("~/h2db/", "tweet-db").build();
     DataSource db =
         JdbcConnectionPool.create(config.getJdbcUrl(), config.getUsername(), config.getPassword());
     String tableName = "tweets";
 
-
-    Query query = createQuery("東京オリンピック");
+    log.info("Db config={}", config);
+    Query query = createQuery("コロナ ワクチン");
     new TweetRecorder(twitter, db, tableName).fetchAndRecord(query);
   }
 

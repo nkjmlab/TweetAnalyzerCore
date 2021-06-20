@@ -11,17 +11,33 @@ import org.apache.logging.log4j.Logger;
 import org.nkjmlab.util.lang.Try;
 import twitter4j.IDs;
 import twitter4j.Paging;
+import twitter4j.QueryResult;
 import twitter4j.ResponseList;
 import twitter4j.Status;
 import twitter4j.Twitter;
+import twitter4j.TwitterException;
 import twitter4j.api.TimelinesResources;
 
-public class TimeLineReader {
+public class TwitterReader {
   private static Logger log = LogManager.getLogger();
   private Twitter twitter;
 
-  public TimeLineReader(Twitter twitter) {
+  public TwitterReader(Twitter twitter) {
     this.twitter = twitter;
+  }
+
+
+
+  public List<Status> search(twitter4j.Query query) {
+
+    try {
+      QueryResult result = twitter.search(query);
+      List<Status> tweets = result.getTweets();
+      return tweets;
+    } catch (TwitterException e) {
+      throw Try.rethrow(e);
+    }
+
   }
 
   public List<Status> getTimeLine(long userId) {

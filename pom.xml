@@ -8,12 +8,11 @@
   <packaging>pom</packaging>
   <url>https://github.com/nkjmlab/</url>
   <properties>
-    <nkjmlab-utils-version>0.0.4</nkjmlab-utils-version>
-    <junit-version>5.3.2</junit-version>
+    <nkjmlab-utils-version>[0.,)</nkjmlab-utils-version>
+    <junit-version>5.7.2</junit-version>
     <log4j-version>2.14.1</log4j-version>
     <assertj-version>3.19.0</assertj-version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <failOnMissingWebXml>false</failOnMissingWebXml>
     <additionalparam>-Xdoclint:none</additionalparam>
     <downloadSources>true</downloadSources>
     <downloadJavadocs>true</downloadJavadocs>
@@ -59,7 +58,9 @@
   <modules>
     <module>nkjmlab-utils-twitter</module>
     <module>nkjmlab-utils-twitter-example</module>
+    <module>nkjmlab-utils-twitter-template</module>
   </modules>
+
   <dependencies>
     <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
     <dependency>

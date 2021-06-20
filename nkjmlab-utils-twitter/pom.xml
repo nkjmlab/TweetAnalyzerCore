@@ -8,12 +8,23 @@
     <artifactId>nkjmlab-utils-twitter-parent</artifactId>
     <version>0.0.4</version>
   </parent>
-
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>bom</artifactId>
+        <version>2.16.29</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <properties>
     <jackson-version>2.12.3</jackson-version>
-    <junit-version>5.7.1</junit-version>
-    <slf4j-version>1.7.30</slf4j-version>
     <h2-version>1.4.200</h2-version>
+    <additionalparam>-Xdoclint:none</additionalparam>
+    <downloadSources>true</downloadSources>
+    <downloadJavadocs>true</downloadJavadocs>
   </properties>
   <dependencies>
     <!-- https://mvnrepository.com/artifact/org.twitter4j/twitter4j-core -->
@@ -22,15 +33,12 @@
       <artifactId>twitter4j-core</artifactId>
       <version>[4.0,)</version>
     </dependency>
-
     <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
       <version>${log4j-version}</version>
     </dependency>
-
-
     <!-- https://mvnrepository.com/artifact/org.nkjmlab/sorm4j -->
     <dependency>
       <groupId>org.nkjmlab</groupId>
@@ -42,6 +50,29 @@
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <version>${h2-version}</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl -->
+    <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-slf4j-impl</artifactId>
+        <version>2.14.1</version>
+        <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>comprehend</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>comprehendmedical</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>s3</artifactId>
+      <optional>true</optional>
     </dependency>
   </dependencies>
 </project>

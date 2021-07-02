@@ -30,7 +30,7 @@ public class TweetTable {
    */
   public TweetTable(DataSource dataSource, String tableName) {
     this.orm = Sorm.create(dataSource);
-    this.schema = new TableSchema.Builder().setTableName(tableName)
+    this.schema = TableSchema.builder().setTableName(tableName)
         .addColumnDefinition(ID, BIGINT, PRIMARY_KEY).addColumnDefinition(CREATED_AT, TIMESTAMP)
         .addColumnDefinition(LAT, DOUBLE).addColumnDefinition(LON, DOUBLE)
         .addColumnDefinition(PLACE, VARCHAR).addColumnDefinition(USER, VARCHAR)

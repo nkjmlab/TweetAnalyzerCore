@@ -23,7 +23,7 @@ public class QueryTable {
   public QueryTable(DataSource dataSource) {
     String tableName = "QUERYS";
     this.orm = Sorm.create(dataSource);
-    this.schema = new TableSchema.Builder().setTableName(tableName)
+    this.schema = TableSchema.builder().setTableName(tableName)
         .addColumnDefinition(ID, BIGINT, PRIMARY_KEY, AUTO_INCREMENT)
         .addColumnDefinition(CREATED_AT, TIMESTAMP).addColumnDefinition(TWEET_IDS, ARRAY)
         .addColumnDefinition(QUERY, VARCHAR).addColumnDefinition(MAX_ID, BIGINT)
